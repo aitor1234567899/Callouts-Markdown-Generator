@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Callouts Markdown — Guía y Generador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0e11; --bg2: #16161b; --bg3: #1e1e26;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
+    --text: #f0ede8; --text2: #9a9690; --text3: #5c5956;
+    --note: #3b82f6; --note-bg: rgba(59,130,246,0.1); --note-border: rgba(59,130,246,0.35);
+    --tip: #10b981; --tip-bg: rgba(16,185,129,0.1); --tip-border: rgba(16,185,129,0.35);
+    --important: #a855f7; --important-bg: rgba(168,85,247,0.1); --important-border: rgba(168,85,247,0.35);
+    --warning: #f59e0b; --warning-bg: rgba(245,158,11,0.1); --warning-border: rgba(245,158,11,0.35);
+    --caution: #ef4444; --caution-bg: rgba(239,68,68,0.1); --caution-border: rgba(239,68,68,0.35);
+    --radius: 10px;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.7; min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E"); pointer-events: none; z-index: 900; opacity: 0.5; }
+
+  /* HEADER */
+  header { border-bottom: 1px solid var(--border); padding: 0 2rem; position: sticky; top: 0; background: rgba(14,14,17,0.9); backdrop-filter: blur(16px); z-index: 200; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { font-family: 'Instrument Serif', serif; font-size: 20px; letter-spacing: -0.02em; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  .logo-dot { width: 8px; height: 8px; background: var(--tip); border-radius: 50%; display: inline-block; animation: pulse 2s ease infinite; }
+  nav { display: flex; gap: 4px; }
+  nav a { color: var(--text2); text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: 6px; transition: all 0.15s; }
+  nav a:hover { color: var(--text); background: var(--bg3); }
+
+  /* HERO */
+  .hero { padding: 100px 2rem 80px; max-width: 800px; margin: 0 auto; text-align: center; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 100px; padding: 5px 14px; font-size: 12px; color: var(--text2); margin-bottom: 28px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; animation: fadeUp 0.6s ease both; }
+  .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tip); animation: pulse 2s ease infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  h1 { font-family: 'Instrument Serif', serif; font-size: clamp(44px, 8vw, 72px); line-height: 1.05; letter-spacing: -0.03em; color: var(--text); margin-bottom: 20px; animation: fadeUp 0.6s ease 0.1s both; }
+  h1 em { font-style: italic; color: var(--text2); }
+  .hero-sub { font-size: 18px; color: var(--text2); font-weight: 300; max-width: 520px; margin: 0 auto 40px; animation: fadeUp 0.6s ease 0.2s both; }
+  .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.6s ease 0.3s both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.15s ease; font-family: 'DM Sans', sans-serif; border: none; }
+  .btn-primary { background: var(--text); color: var(--bg); }
+  .btn-primary:hover { background: #d4d1cc; transform: translateY(-1px); }
+  .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border2); }
+  .btn-secondary:hover { background: var(--bg3); }
+  .glow-line { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border2) 30%, var(--border2) 70%, transparent); }
+
+  /* SECTIONS */
+  .section { max-width: 1000px; margin: 0 auto; padding: 80px 2rem; }
+  .section-header { margin-bottom: 48px; }
+  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 10px; font-weight: 500; }
+  h2 { font-family: 'Instrument Serif', serif; font-size: clamp(30px, 5vw, 42px); letter-spacing: -0.02em; line-height: 1.1; color: var(--text); }
+  h2 + p { color: var(--text2); font-weight: 300; margin-top: 12px; max-width: 560px; }
+
+  /* CALLOUT CARDS GRID */
+  .callout-grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  .callout-card-big {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px 20px 20px; cursor: pointer; transition: all 0.2s ease;
+    display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;
+  }
+  .callout-card-big::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.2s; }
+  .callout-card-big:hover { transform: translateY(-3px); border-color: var(--border2); }
+  .ccb-icon { font-size: 28px; line-height: 1; }
+  .ccb-name { font-size: 15px; font-weight: 500; }
+  .ccb-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
+  .ccb-cta { font-size: 11px; color: var(--text3); margin-top: auto; padding-top: 8px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .ccb-cta span { transition: transform 0.15s; display: inline-block; }
+  .callout-card-big:hover .ccb-cta span { transform: translateX(3px); }
+
+  .ccb-note { border-color: var(--note-border); }
+  .ccb-note .ccb-name { color: var(--note); }
+  .ccb-tip { border-color: var(--tip-border); }
+  .ccb-tip .ccb-name { color: var(--tip); }
+  .ccb-important { border-color: var(--important-border); }
+  .ccb-important .ccb-name { color: var(--important); }
+  .ccb-warning { border-color: var(--warning-border); }
+  .ccb-warning .ccb-name { color: var(--warning); }
+  .ccb-caution { border-color: var(--caution-border); }
+  .ccb-caution .ccb-name { color: var(--caution); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+    z-index: 500; display: flex; align-items: center; justify-content: center;
+    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--border2); border-radius: 18px;
+    width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto;
+    position: relative; transform: translateY(30px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1), opacity 0.25s ease;
+    opacity: 0;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text2); font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; z-index: 10; line-height: 1;
+  }
+  .modal-close:hover { background: var(--bg); color: var(--text); }
+
+  .modal-header { padding: 32px 32px 24px; border-bottom: 1px solid var(--border); }
+  .modal-icon { font-size: 42px; margin-bottom: 14px; line-height: 1; }
+  .modal-title { font-family: 'Instrument Serif', serif; font-size: 32px; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .modal-subtitle { font-size: 14px; color: var(--text2); font-weight: 300; }
+
+  .modal-body { padding: 28px 32px 32px; display: flex; flex-direction: column; gap: 28px; }
+
+  .modal-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 10px; }
+
+  .modal-when { font-size: 14px; color: var(--text2); line-height: 1.7; }
+  .modal-when strong { color: var(--text); font-weight: 500; }
+
+  .modal-rendered { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 14px 18px; }
+  .modal-rendered-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .modal-rendered-body { font-size: 14px; line-height: 1.65; color: var(--text); }
+
+  .modal-code { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .modal-code-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .modal-code-lang { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+  .modal-code-copy { font-size: 11px; padding: 4px 10px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 5px; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .modal-code-copy:hover { color: var(--text); }
+  pre.modal-pre { padding: 16px; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.7; color: var(--text2); background: none; border: none; border-radius: 0; overflow-x: auto; margin: 0; }
+  .kw { color: #a78bfa; } .str { color: #6ee7b7; } .cm { color: #4b5563; font-style: italic; }
+
+  .modal-tips { display: flex; flex-direction: column; gap: 8px; }
+  .modal-tip { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .modal-tip::before { content: '→'; color: var(--text3); flex-shrink: 0; margin-top: 1px; }
+
+  /* SINTAXIS */
+  .syntax-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .syntax-grid { grid-template-columns: 1fr; } }
+  .syntax-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .syntax-card h3 { font-size: 14px; font-weight: 500; color: var(--text2); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .syntax-card h3 .step { width: 20px; height: 20px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text3); flex-shrink: 0; }
+  pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; color: var(--text2); }
+  code { font-family: 'DM Mono', monospace; background: var(--bg3); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 0.9em; color: var(--text2); }
+
+  /* GENERADOR */
+  #generador { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .gen-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; }
+  @media (max-width: 700px) { .gen-layout { grid-template-columns: 1fr; } nav { display: none; } }
+  .gen-panel { display: flex; flex-direction: column; gap: 16px; }
+  .gen-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 4px; }
+  .type-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .type-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text3); cursor: pointer; transition: all 0.15s; font-size: 11px; font-family: 'DM Sans', sans-serif; }
+  .type-btn .t-icon { font-size: 18px; }
+  .type-btn:hover { border-color: var(--border2); color: var(--text2); }
+  .type-btn.active-note { border-color: var(--note); background: var(--note-bg); color: var(--note); }
+  .type-btn.active-tip { border-color: var(--tip); background: var(--tip-bg); color: var(--tip); }
+  .type-btn.active-important { border-color: var(--important); background: var(--important-bg); color: var(--important); }
+  .type-btn.active-warning { border-color: var(--warning); background: var(--warning-bg); color: var(--warning); }
+  .type-btn.active-caution { border-color: var(--caution); background: var(--caution-bg); color: var(--caution); }
+  textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 14px; resize: vertical; min-height: 130px; line-height: 1.65; transition: border-color 0.15s; outline: none; }
+  textarea:focus { border-color: var(--border2); }
+  textarea::placeholder { color: var(--text3); }
+  .output-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .output-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .output-tabs { display: flex; gap: 2px; }
+  .output-tab { font-size: 12px; padding: 4px 10px; border-radius: 5px; cursor: pointer; color: var(--text3); border: none; background: none; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
+  .output-tab:hover { color: var(--text2); }
+  .output-tab.ot-active { background: var(--bg2); color: var(--text); }
+  .copy-btn2 { font-size: 12px; padding: 5px 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+  .copy-btn2:hover { color: var(--text); }
+  .output-content { padding: 16px; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; color: var(--text2); white-space: pre-wrap; word-break: break-word; min-height: 100px; }
+  .preview-content { padding: 16px; display: none; }
+  .preview-rendered { border-left: 3px solid; padding: 14px 16px; border-radius: 0 8px 8px 0; }
+  .preview-rendered-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .preview-rendered-body { font-size: 14px; line-height: 1.65; }
+
+  /* TIPS */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 40px; }
+  .tip-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .tip-card-num { font-family: 'Instrument Serif', serif; font-size: 32px; color: var(--text3); line-height: 1; margin-bottom: 10px; }
+  .tip-card h4 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .tip-card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  footer { border-top: 1px solid var(--border); padding: 40px 2rem; text-align: center; color: var(--text3); font-size: 13px; }
+  footer a { color: var(--text3); text-decoration: underline; text-underline-offset: 3px; }
+  footer a:hover { color: var(--text2); }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="#" class="logo"><span class="logo-dot"></span> Callouts MD</a>
+  <nav>
+    <a href="#tipos">Tipos</a>
+    <a href="#sintaxis">Sintaxis</a>
+    <a href="#generador">Generador</a>
+    <a href="#consejos">Consejos</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Guía completa de Markdown</div>
+  <h1>Los callouts<br><em>que llaman la atención</em></h1>
+  <p class="hero-sub">Aprende a usar alertas y callouts en Markdown. Resalta lo que importa: notas, consejos, advertencias y más.</p>
+  <div class="hero-ctas">
+    <a href="#generador" class="btn btn-primary">Ir al generador →</a>
+    <a href="#tipos" class="btn btn-secondary">Ver los tipos</a>
+  </div>
+</section>
+
+<div class="glow-line"></div>
+
+<!-- TIPOS -->
+<section id="tipos" class="section">
+  <div class="section-header reveal">
+    <div class="section-label">Los 5 tipos</div>
+    <h2>¿Qué tipo de callout necesitas?</h2>
+    <p>Haz clic en cualquier tipo para ver su explicación completa, ejemplos y código.</p>
+  </div>
+
+  <div class="callout-grid-5 reveal">
+
+    <div class="callout-card-big ccb-note" onclick="openModal('NOTE')">
+      <div class="ccb-icon">ℹ️</div>
+      <div class="ccb-name">NOTE</div>
+      <div class="ccb-desc">Información útil que el lector debería tener en cuenta</div>
+      <div class="ccb-cta">Ver detalles <span>→</span></div>
+    </div>
+
+    <div class="callout-card-big ccb-tip" onclick="openModal('TIP')">
+      <div class="ccb-icon">💡</div>
+      <div class="ccb-name">TIP</div>
+      <div class="ccb-desc">Consejo opcional que puede mejorar la experiencia</div>
+      <div class="ccb-cta">Ver detalles <span>→</span></div>
+    </div>
+
+    <div class="callout-card-big ccb-important" onclick="openModal('IMPORTANT')">
+      <div class="ccb-icon">📣</div>
+      <div class="ccb-name">IMPORTANT</div>
+      <div class="ccb-desc">Información crucial para que el proceso funcione</div>
+      <div class="ccb-cta">Ver detalles <span>→</span></div>
+    </div>
+
+    <div class="callout-card-big ccb-warning" onclick="openModal('WARNING')">
+      <div class="ccb-icon">⚠️</div>
+      <div class="ccb-name">WARNING</div>
+      <div class="ccb-desc">Riesgo potencial que requiere atención inmediata</div>
+      <div class="ccb-cta">Ver detalles <span>→</span></div>
+    </div>
+
+    <div class="callout-card-big ccb-caution" onclick="openModal('CAUTION')">
+      <div class="ccb-icon">🔴</div>
+      <div class="ccb-name">CAUTION</div>
+      <div class="ccb-desc">Consecuencia negativa si se realiza una acción incorrecta</div>
+      <div class="ccb-cta">Ver detalles <span>→</span></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
+    <div class="modal-header">
+      <div class="modal-icon" id="mIcon"></div>
+      <div class="modal-title" id="mTitle"></div>
+      <div class="modal-subtitle" id="mSubtitle"></div>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="modal-section-label">¿Cuándo usarlo?</div>
+        <div class="modal-when" id="mWhen"></div>
+      </div>
+      <div>
+        <div class="modal-section-label">Aspecto renderizado</div>
+        <div class="modal-rendered" id="mRendered">
+          <div class="modal-rendered-title" id="mRenderedTitle"></div>
+          <div class="modal-rendered-body" id="mRenderedBody"></div>
+        </div>
+      </div>
+      <div>
+        <div class="modal-section-label">Código Markdown</div>
+        <div class="modal-code">
+          <div class="modal-code-bar">
+            <span class="modal-code-lang">markdown</span>
+            <button class="modal-code-copy" onclick="copyModalCode()">Copiar</button>
+          </div>
+          <pre class="modal-pre" id="mCode"></pre>
+        </div>
+      </div>
+      <div>
+        <div class="modal-section-label">Consejos de uso</div>
+        <div class="modal-tips" id="mTips"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- SINTAXIS -->
+<section id="sintaxis" class="section">
+  <div class="section-header reveal">
+    <div class="section-label">Cómo escribirlos</div>
+    <h2>La sintaxis paso a paso</h2>
+    <p>Los callouts usan la sintaxis de blockquote de Markdown, extendida con una etiqueta especial.</p>
+  </div>
+  <div class="syntax-grid reveal">
+    <div class="syntax-card">
+      <h3><span class="step">1</span> Estructura básica</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Comienza con <code>&gt;</code> seguido de <code>[!TIPO]</code>. El contenido va en las líneas siguientes con <code>&gt;</code>.</p>
+      <pre><span class="kw">&gt; [!NOTE]</span>  
+<span class="str">&gt; Tu mensaje aquí.</span>  </pre>
+    </div>
+    <div class="syntax-card">
+      <h3><span class="step">2</span> Saltos de línea</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Añade <strong>dos espacios</strong> al final de cada línea para crear un salto de línea explícito.</p>
+      <pre><span class="kw">&gt; [!TIP]</span>  
+<span class="str">&gt; Primera línea.</span>  
+<span class="str">&gt; Segunda línea.</span>  </pre>
+    </div>
+    <div class="syntax-card">
+      <h3><span class="step">3</span> Varios párrafos</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Para párrafos separados añade una línea vacía con solo <code>&gt;</code> entre ellos.</p>
+      <pre><span class="kw">&gt; [!IMPORTANT]</span>  
+<span class="str">&gt; Primer párrafo.</span>  
+<span class="cm">&gt;</span>
+<span class="str">&gt; Segundo párrafo.</span>  </pre>
+    </div>
+    <div class="syntax-card">
+      <h3><span class="step">4</span> Compatibilidad</h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Funciona de forma nativa en GitHub. Para Next.js y otros entornos usa el plugin <code>rehype-github-alerts</code>.</p>
+      <pre><span class="cm"># next.config.mjs</span>
+<span class="kw">import</span> { rehypeGithubAlerts } 
+  <span class="kw">from</span> <span class="str">'rehype-github-alerts'</span>
+</pre>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- GENERADOR -->
+<section id="generador">
+  <div class="section">
+    <div class="section-header reveal">
+      <div class="section-label">Herramienta</div>
+      <h2>Generador de callouts</h2>
+      <p>Selecciona el tipo, escribe tu texto y copia el código listo para pegar.</p>
+    </div>
+    <div class="gen-layout reveal">
+      <div class="gen-panel">
+        <div>
+          <div class="gen-label">Tipo de callout</div>
+          <div class="type-selector">
+            <button class="type-btn active-note" onclick="selectGenType('NOTE', this)"><span class="t-icon">ℹ️</span>Note</button>
+            <button class="type-btn" onclick="selectGenType('TIP', this)"><span class="t-icon">💡</span>Tip</button>
+            <button class="type-btn" onclick="selectGenType('IMPORTANT', this)"><span class="t-icon">📣</span>Important</button>
+            <button class="type-btn" onclick="selectGenType('WARNING', this)"><span class="t-icon">⚠️</span>Warning</button>
+            <button class="type-btn" onclick="selectGenType('CAUTION', this)"><span class="t-icon">🔴</span>Caution</button>
+          </div>
+        </div>
+        <div>
+          <div class="gen-label">Tu texto</div>
+          <textarea id="genText" placeholder="Escribe aquí el contenido del callout..." oninput="updateGen()">Recuerda hacer commit de tus cambios antes de actualizar las dependencias.</textarea>
+        </div>
+      </div>
+      <div class="gen-panel">
+        <div class="gen-label">Resultado</div>
+        <div class="output-block">
+          <div class="output-topbar">
+            <div class="output-tabs">
+              <button class="output-tab ot-active" id="tabCode" onclick="switchOutputTab('code', this)">Código</button>
+              <button class="output-tab" id="tabPreview" onclick="switchOutputTab('preview', this)">Previsualización</button>
+            </div>
+            <button class="copy-btn2" id="copyBtn" onclick="copyGen()">Copiar</button>
+          </div>
+          <div class="output-content" id="genOutput"></div>
+          <div class="preview-content" id="genPreview">
+            <div class="preview-rendered" id="previewBlock">
+              <div class="preview-rendered-title" id="previewTitle"></div>
+              <div class="preview-rendered-body" id="previewBody"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CONSEJOS -->
+<section id="consejos" class="section">
+  <div class="section-header reveal">
+    <div class="section-label">Buenas prácticas</div>
+    <h2>Úsalos bien</h2>
+  </div>
+  <div class="tips-grid reveal">
+    <div class="tip-card">
+      <div class="tip-card-num">01</div>
+      <h4>No abuses de ellos</h4>
+      <p>Si todo es importante, nada lo es. Reserva los callouts para información realmente crítica o útil.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-card-num">02</div>
+      <h4>Elige el tipo correcto</h4>
+      <p>Usa <code>WARNING</code> y <code>CAUTION</code> solo cuando haya un riesgo real, no para información general.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-card-num">03</div>
+      <h4>Sé conciso</h4>
+      <p>Los callouts funcionan mejor con textos cortos y directos. Para contenido largo usa párrafos normales.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-card-num">04</div>
+      <h4>Dos espacios al final</h4>
+      <p>Añade dos espacios al final de cada línea para crear saltos de línea explícitos en el renderizado.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Basado en la <a href="https://github.com/orgs/community/discussions/16925" target="_blank">especificación de alertas de GitHub</a> y el plugin <a href="https://github.com/chrisweb/rehype-github-alerts" target="_blank">rehype-github-alerts</a>.</p>
+</footer>
+
+<script>
+const TYPES = {
+  NOTE: {
+    icon: 'ℹ️', label: 'Note', color: '#3b82f6',
+    bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.4)',
+    subtitle: 'Para información contextual útil',
+    when: 'Úsalo cuando quieras destacar información que el lector debería tener en cuenta aunque esté leyendo por encima. <strong>No implica peligro</strong>, solo es algo relevante que conviene no pasar por alto.',
+    example: 'Los archivos de configuración se guardan en la carpeta <code>/config</code> de tu proyecto.',
+    tips: [
+      'Ideal para aclaraciones técnicas o detalles secundarios.',
+      'No lo uses si la información es crítica para el funcionamiento — en ese caso usa IMPORTANT.',
+      'Funciona bien al final de un paso para añadir contexto extra.'
+    ],
+    code: '> [!NOTE]  \n> Los archivos de configuración se guardan\n> en la carpeta /config de tu proyecto.  '
+  },
+  TIP: {
+    icon: '💡', label: 'Tip', color: '#10b981',
+    bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.4)',
+    subtitle: 'Para consejos y atajos opcionales',
+    when: 'Úsalo para compartir consejos <strong>opcionales</strong> que pueden mejorar la experiencia del usuario, pero sin los cuales el proceso igual funciona. Atajos, mejores prácticas o sugerencias de productividad.',
+    example: 'Puedes usar el atajo Ctrl+Shift+P para abrir la paleta de comandos rápidamente.',
+    tips: [
+      'La palabra clave es "opcional": si es obligatorio, usa NOTE o IMPORTANT.',
+      'Perfecto para atajos de teclado, trucos de rendimiento o alternativas más rápidas.',
+      'Evita usarlo para cosas que el usuario ya debería saber.'
+    ],
+    code: '> [!TIP]  \n> Puedes usar Ctrl+Shift+P para abrir\n> la paleta de comandos rápidamente.  '
+  },
+  IMPORTANT: {
+    icon: '📣', label: 'Important', color: '#a855f7',
+    bg: 'rgba(168,85,247,0.08)', border: 'rgba(168,85,247,0.4)',
+    subtitle: 'Para información crucial sin la que el proceso falla',
+    when: 'Úsalo cuando la información sea <strong>necesaria para el éxito</strong> de la tarea. Sin esta información el usuario podría cometer errores o el proceso no funcionará. Más urgente que NOTE pero sin implicar peligro físico o irreversible.',
+    example: 'Debes configurar las variables de entorno en el archivo .env antes de iniciar el servidor.',
+    tips: [
+      'Si omitir esta información rompe el flujo, es IMPORTANT.',
+      'No lo uses para información general — reservalo para pasos obligatorios.',
+      'Aparece con más peso visual que NOTE, úsalo con criterio.'
+    ],
+    code: '> [!IMPORTANT]  \n> Debes configurar las variables de entorno\n> en el archivo .env antes de iniciar.  '
+  },
+  WARNING: {
+    icon: '⚠️', label: 'Warning', color: '#f59e0b',
+    bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.4)',
+    subtitle: 'Para riesgos que requieren atención inmediata',
+    when: 'Úsalo cuando exista un <strong>riesgo real</strong>: pérdida de datos, errores difíciles de revertir, comportamientos inesperados o situaciones que pueden causar problemas graves si no se toman precauciones.',
+    example: 'Esta operación eliminará permanentemente todos los registros. Haz una copia de seguridad antes de continuar.',
+    tips: [
+      'Reservalo para riesgos reales: pérdida de datos, seguridad, comportamiento destructivo.',
+      'Si el riesgo es menor o reversible, considera usar NOTE o IMPORTANT.',
+      'Sé específico: dile al usuario exactamente qué puede salir mal.'
+    ],
+    code: '> [!WARNING]  \n> Esta operación eliminará todos los registros.\n> Haz una copia de seguridad antes de continuar.  '
+  },
+  CAUTION: {
+    icon: '🔴', label: 'Caution', color: '#ef4444',
+    bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.4)',
+    subtitle: 'Para consecuencias negativas directas de una acción',
+    when: 'Similar a WARNING pero más enfocado en las <strong>consecuencias negativas directas</strong> de hacer algo mal. Se usa cuando una acción concreta tiene un resultado claramente perjudicial que el usuario debe evitar.',
+    example: 'Modificar este archivo manualmente puede corromper la base de datos y requerir una restauración completa.',
+    tips: [
+      'Diferencia clave con WARNING: CAUTION describe la consecuencia de una acción específica.',
+      'Úsalo cuando quieras decir "si haces X, pasará Y (malo)".',
+      'Es el tipo más severo — no lo uses en exceso o perderá impacto.'
+    ],
+    code: '> [!CAUTION]  \n> Modificar este archivo puede corromper\n> la base de datos y requerir restauración.  '
+  }
+};
+
+let genType = 'NOTE';
+let currentModalCode = '';
+
+function openModal(type) {
+  const t = TYPES[type];
+  document.getElementById('mIcon').textContent = t.icon;
+  document.getElementById('mTitle').textContent = t.label;
+  document.getElementById('mTitle').style.color = t.color;
+  document.getElementById('mSubtitle').textContent = t.subtitle;
+  document.getElementById('mWhen').innerHTML = t.when;
+
+  const r = document.getElementById('mRendered');
+  r.style.borderLeftColor = t.border;
+  r.style.background = t.bg;
+  const rt = document.getElementById('mRenderedTitle');
+  rt.style.color = t.color;
+  rt.textContent = t.icon + ' ' + t.label;
+  document.getElementById('mRenderedBody').innerHTML = t.example;
+
+  currentModalCode = t.code;
+  document.getElementById('mCode').textContent = t.code;
+
+  const tipsEl = document.getElementById('mTips');
+  tipsEl.innerHTML = t.tips.map(tip => `<div class="modal-tip">${tip}</div>`).join('');
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function copyModalCode() {
+  navigator.clipboard.writeText(currentModalCode).then(() => {
+    const btn = document.querySelector('.modal-code-copy');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+  });
+}
+
+// GENERADOR
+function selectGenType(type, btn) {
+  document.querySelectorAll('.type-btn').forEach(b => { b.className = 'type-btn'; });
+  btn.classList.add('active-' + type.toLowerCase());
+  genType = type;
+  updateGen();
+}
+
+function updateGen() {
+  const text = document.getElementById('genText').value.trim();
+  const lines = text.split('\n');
+  const codeLines = ['> [!' + genType + ']  '];
+  lines.forEach(l => codeLines.push('> ' + (l || '') + '  '));
+  const code = codeLines.join('\n');
+  document.getElementById('genOutput').textContent = code;
+
+  const t = TYPES[genType];
+  const pb = document.getElementById('previewBlock');
+  pb.style.borderLeftColor = t.border;
+  pb.style.background = t.bg;
+  document.getElementById('previewTitle').style.color = t.color;
+  document.getElementById('previewTitle').textContent = t.icon + ' ' + t.label;
+  const safeText = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  document.getElementById('previewBody').innerHTML = safeText || '<span style="color:var(--text3)">Tu texto aparecerá aquí...</span>';
+}
+
+function switchOutputTab(tab, btn) {
+  document.querySelectorAll('.output-tab').forEach(b => b.classList.remove('ot-active'));
+  btn.classList.add('ot-active');
+  document.getElementById('genOutput').style.display = tab === 'code' ? '' : 'none';
+  document.getElementById('genPreview').style.display = tab === 'preview' ? 'block' : 'none';
+  document.getElementById('copyBtn').style.display = tab === 'code' ? '' : 'none';
+}
+
+function copyGen() {
+  const code = document.getElementById('genOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+  });
+}
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+updateGen();
+</script>
+</body>
+</html>
