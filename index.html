@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -133,10 +134,6 @@
   pre.modal-pre { padding: 16px; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.7; color: var(--text2); background: none; border: none; border-radius: 0; overflow-x: auto; margin: 0; }
   .kw { color: #a78bfa; } .str { color: #6ee7b7; } .cm { color: #4b5563; font-style: italic; }
 
-  .modal-tips { display: flex; flex-direction: column; gap: 8px; }
-  .modal-tip { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text2); line-height: 1.6; }
-  .modal-tip::before { content: '→'; color: var(--text3); flex-shrink: 0; margin-top: 1px; }
-
   /* SINTAXIS */
   .syntax-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   @media (max-width: 640px) { .syntax-grid { grid-template-columns: 1fr; } }
@@ -150,8 +147,8 @@
   #generador { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
   .gen-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; }
   @media (max-width: 700px) { .gen-layout { grid-template-columns: 1fr; } nav { display: none; } }
-  .gen-panel { display: flex; flex-direction: column; gap: 16px; }
-  .gen-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 4px; }
+  .gen-panel { display: flex; flex-direction: column; gap: 20px; }
+  .gen-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 6px; }
   .type-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .type-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text3); cursor: pointer; transition: all 0.15s; font-size: 11px; font-family: 'DM Sans', sans-serif; }
   .type-btn .t-icon { font-size: 18px; }
@@ -161,22 +158,26 @@
   .type-btn.active-important { border-color: var(--important); background: var(--important-bg); color: var(--important); }
   .type-btn.active-warning { border-color: var(--warning); background: var(--warning-bg); color: var(--warning); }
   .type-btn.active-caution { border-color: var(--caution); background: var(--caution-bg); color: var(--caution); }
-  textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 14px; resize: vertical; min-height: 130px; line-height: 1.65; transition: border-color 0.15s; outline: none; }
+  textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 14px; resize: vertical; min-height: 150px; line-height: 1.65; transition: border-color 0.15s; outline: none; }
   textarea:focus { border-color: var(--border2); }
   textarea::placeholder { color: var(--text3); }
-  .output-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .output-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  .output-tabs { display: flex; gap: 2px; }
-  .output-tab { font-size: 12px; padding: 4px 10px; border-radius: 5px; cursor: pointer; color: var(--text3); border: none; background: none; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
-  .output-tab:hover { color: var(--text2); }
-  .output-tab.ot-active { background: var(--bg2); color: var(--text); }
+  
+  /* CONTENEDORES DE SALIDA */
+  .output-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  .output-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01); }
   .copy-btn2 { font-size: 12px; padding: 5px 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
   .copy-btn2:hover { color: var(--text); }
-  .output-content { padding: 16px; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; color: var(--text2); white-space: pre-wrap; word-break: break-word; min-height: 100px; }
-  .preview-content { padding: 16px; display: none; }
-  .preview-rendered { border-left: 3px solid; padding: 14px 16px; border-radius: 0 8px 8px 0; }
-  .preview-rendered-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-  .preview-rendered-body { font-size: 14px; line-height: 1.65; }
+  .output-content { padding: 16px; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; color: var(--text2); white-space: pre-wrap; word-break: break-word; min-height: 80px; }
+  
+  /* PREVISUALIZACIÓN PERMANENTE ESTILO DISCORD/GITHUB */
+  .preview-container { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: block !important; }
+  .preview-gh-label { font-size: 11px; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+  .preview-gh-label::before { content: ''; display: inline-block; width: 14px; height: 14px; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%235c5956' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/%3E%3C/svg%3E") no-repeat center / contain; opacity: 0.6; }
+  
+  .preview-rendered { border-left: 4px solid; padding: 16px 20px; border-radius: 0 8px 8px 0; font-family: 'DM Sans', sans-serif; transition: all 0.2s ease; }
+  .preview-rendered-title { font-size: 14px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .preview-rendered-title .pr-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .preview-rendered-body { font-size: 14.5px; line-height: 1.7; color: var(--text); font-weight: 400; }
 
   /* TIPS */
   .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 40px; }
@@ -227,42 +228,36 @@
   </div>
 
   <div class="callout-grid-5 reveal">
-
     <div class="callout-card-big ccb-note" onclick="openModal('NOTE')">
       <div class="ccb-icon">ℹ️</div>
       <div class="ccb-name">NOTE</div>
       <div class="ccb-desc">Información útil que el lector debería tener en cuenta</div>
       <div class="ccb-cta">Ver detalles <span>→</span></div>
     </div>
-
     <div class="callout-card-big ccb-tip" onclick="openModal('TIP')">
       <div class="ccb-icon">💡</div>
       <div class="ccb-name">TIP</div>
       <div class="ccb-desc">Consejo opcional que puede mejorar la experiencia</div>
       <div class="ccb-cta">Ver detalles <span>→</span></div>
     </div>
-
     <div class="callout-card-big ccb-important" onclick="openModal('IMPORTANT')">
       <div class="ccb-icon">📣</div>
       <div class="ccb-name">IMPORTANT</div>
       <div class="ccb-desc">Información crucial para que el proceso funcione</div>
       <div class="ccb-cta">Ver detalles <span>→</span></div>
     </div>
-
     <div class="callout-card-big ccb-warning" onclick="openModal('WARNING')">
       <div class="ccb-icon">⚠️</div>
       <div class="ccb-name">WARNING</div>
       <div class="ccb-desc">Riesgo potencial que requiere atención inmediata</div>
       <div class="ccb-cta">Ver detalles <span>→</span></div>
     </div>
-
     <div class="callout-card-big ccb-caution" onclick="openModal('CAUTION')">
       <div class="ccb-icon">🔴</div>
       <div class="ccb-name">CAUTION</div>
       <div class="ccb-desc">Consecuencia negativa si se realiza una acción incorrecta</div>
       <div class="ccb-cta">Ver detalles <span>→</span></div>
     </div>
-
   </div>
 </section>
 
@@ -349,15 +344,17 @@
 
 <hr class="divider">
 
-<!-- GENERADOR -->
+<!-- GENERADOR CORREGIDO (VISUALIZACIÓN PERMANENTE) -->
 <section id="generador">
   <div class="section">
     <div class="section-header reveal">
       <div class="section-label">Herramienta</div>
       <h2>Generador de callouts</h2>
-      <p>Selecciona el tipo, escribe tu texto y copia el código listo para pegar.</p>
+      <p>Selecciona el tipo, escribe tu texto y mira cómo cambia la visualización en tiempo real.</p>
     </div>
     <div class="gen-layout reveal">
+      
+      <!-- Panel Izquierdo: Configuración -->
       <div class="gen-panel">
         <div>
           <div class="gen-label">Tipo de callout</div>
@@ -374,25 +371,39 @@
           <textarea id="genText" placeholder="Escribe aquí el contenido del callout..." oninput="updateGen()">Recuerda hacer commit de tus cambios antes de actualizar las dependencias.</textarea>
         </div>
       </div>
+      
+      <!-- Panel Derecho: Visualización y Código Fijos -->
       <div class="gen-panel">
-        <div class="gen-label">Resultado</div>
-        <div class="output-block">
-          <div class="output-topbar">
-            <div class="output-tabs">
-              <button class="output-tab ot-active" id="tabCode" onclick="switchOutputTab('code', this)">Código</button>
-              <button class="output-tab" id="tabPreview" onclick="switchOutputTab('preview', this)">Previsualización</button>
-            </div>
-            <button class="copy-btn2" id="copyBtn" onclick="copyGen()">Copiar</button>
-          </div>
-          <div class="output-content" id="genOutput"></div>
-          <div class="preview-content" id="genPreview">
+        
+        <!-- Bloque de Visualización en Tiempo Real -->
+        <div>
+          <div class="gen-label">Visualización en vivo</div>
+          <div class="preview-container">
+            <div class="preview-gh-label">Resultado Visualizado</div>
             <div class="preview-rendered" id="previewBlock">
-              <div class="preview-rendered-title" id="previewTitle"></div>
+              <div class="preview-rendered-title" id="previewTitle">
+                <span class="pr-icon" id="previewIcon"></span>
+                <span id="previewLabel"></span>
+              </div>
               <div class="preview-rendered-body" id="previewBody"></div>
             </div>
           </div>
         </div>
+
+        <!-- Bloque de Código Markdown Generado -->
+        <div>
+          <div class="gen-label">Código Markdown</div>
+          <div class="output-block">
+            <div class="output-topbar">
+              <span style="font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace;">Output</span>
+              <button class="copy-btn2" id="copyBtn" onclick="copyGen()">Copiar Código</button>
+            </div>
+            <div class="output-content" id="genOutput"></div>
+          </div>
+        </div>
+
       </div>
+
     </div>
   </div>
 </section>
@@ -550,13 +561,21 @@ function copyModalCode() {
   });
 }
 
-// GENERADOR
+// GENERADOR ACTUALIZADO
 function selectGenType(type, btn) {
   document.querySelectorAll('.type-btn').forEach(b => { b.className = 'type-btn'; });
   btn.classList.add('active-' + type.toLowerCase());
   genType = type;
   updateGen();
 }
+
+const OCTICONS = {
+  NOTE: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>',
+  TIP: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"/></svg>',
+  IMPORTANT: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>',
+  WARNING: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>',
+  CAUTION: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>'
+};
 
 function updateGen() {
   const text = document.getElementById('genText').value.trim();
@@ -568,20 +587,20 @@ function updateGen() {
 
   const t = TYPES[genType];
   const pb = document.getElementById('previewBlock');
-  pb.style.borderLeftColor = t.border;
+  pb.style.borderLeftColor = t.color;
   pb.style.background = t.bg;
-  document.getElementById('previewTitle').style.color = t.color;
-  document.getElementById('previewTitle').textContent = t.icon + ' ' + t.label;
-  const safeText = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-  document.getElementById('previewBody').innerHTML = safeText || '<span style="color:var(--text3)">Tu texto aparecerá aquí...</span>';
-}
 
-function switchOutputTab(tab, btn) {
-  document.querySelectorAll('.output-tab').forEach(b => b.classList.remove('ot-active'));
-  btn.classList.add('ot-active');
-  document.getElementById('genOutput').style.display = tab === 'code' ? '' : 'none';
-  document.getElementById('genPreview').style.display = tab === 'preview' ? 'block' : 'none';
-  document.getElementById('copyBtn').style.display = tab === 'code' ? '' : 'none';
+  const iconEl = document.getElementById('previewIcon');
+  iconEl.innerHTML = OCTICONS[genType];
+  iconEl.style.color = t.color;
+
+  const labelEl = document.getElementById('previewLabel');
+  labelEl.textContent = t.label;
+  labelEl.style.color = t.color;
+  document.getElementById('previewTitle').style.color = t.color;
+
+  const safeText = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+  document.getElementById('previewBody').innerHTML = safeText || '<span style="color:var(--text3);font-style:italic;">Tu texto aparecerá aquí...</span>';
 }
 
 function copyGen() {
@@ -589,21 +608,10 @@ function copyGen() {
   navigator.clipboard.writeText(code).then(() => {
     const btn = document.getElementById('copyBtn');
     btn.textContent = '✓ Copiado';
-    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = code;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copiado';
-    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+    setTimeout(() => { btn.textContent = 'Copiar Código'; }, 1800);
   });
 }
 
-// Scroll reveal
 const observer = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
 }, { threshold: 0.1 });
