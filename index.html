@@ -1,736 +1,1984 @@
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Callouts Markdown — Guía y Generador</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #0e0e11; --bg2: #16161b; --bg3: #1e1e26;
-    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
-    --text: #f0ede8; --text2: #9a9690; --text3: #5c5956;
-    --note: #3b82f6; --note-bg: rgba(59,130,246,0.1); --note-border: rgba(59,130,246,0.35);
-    --tip: #10b981; --tip-bg: rgba(16,185,129,0.1); --tip-border: rgba(16,185,129,0.35);
-    --important: #a855f7; --important-bg: rgba(168,85,247,0.1); --important-border: rgba(168,85,247,0.35);
-    --warning: #f59e0b; --warning-bg: rgba(245,158,11,0.1); --warning-border: rgba(245,158,11,0.35);
-    --caution: #ef4444; --caution-bg: rgba(239,68,68,0.1); --caution-border: rgba(239,68,68,0.35);
-    --radius: 10px;
-  }
-  html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.7; min-height: 100vh; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E"); pointer-events: none; z-index: 900; opacity: 0.5; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Callouts Markdown — Guía y Generador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* HEADER */
-  header { border-bottom: 1px solid var(--border); padding: 0 2rem; position: sticky; top: 0; background: rgba(14,14,17,0.9); backdrop-filter: blur(16px); z-index: 200; display: flex; align-items: center; justify-content: space-between; height: 60px; }
-  .logo { font-family: 'Instrument Serif', serif; font-size: 20px; letter-spacing: -0.02em; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 10px; }
-  .logo-dot { width: 8px; height: 8px; background: var(--tip); border-radius: 50%; display: inline-block; animation: pulse 2s ease infinite; }
-  nav { display: flex; gap: 4px; }
-  nav a { color: var(--text2); text-decoration: none; font-size: 13px; padding: 6px 12px; border-radius: 6px; transition: all 0.15s; }
-  nav a:hover { color: var(--text); background: var(--bg3); }
+    :root {
+      --bg: #0e0e11;
+      --bg2: #16161b;
+      --bg3: #1e1e26;
+      --border: rgba(255, 255, 255, 0.07);
+      --border2: rgba(255, 255, 255, 0.13);
+      --text: #f0ede8;
+      --text2: #9a9690;
+      --text3: #5c5956;
+      --note: #3b82f6;
+      --note-bg: rgba(59, 130, 246, 0.1);
+      --note-border: rgba(59, 130, 246, 0.35);
+      --tip: #10b981;
+      --tip-bg: rgba(16, 185, 129, 0.1);
+      --tip-border: rgba(16, 185, 129, 0.35);
+      --important: #a855f7;
+      --important-bg: rgba(168, 85, 247, 0.1);
+      --important-border: rgba(168, 85, 247, 0.35);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.1);
+      --warning-border: rgba(245, 158, 11, 0.35);
+      --caution: #ef4444;
+      --caution-bg: rgba(239, 68, 68, 0.1);
+      --caution-border: rgba(239, 68, 68, 0.35);
+      --radius: 10px;
+    }
 
-  /* HERO */
-  .hero { padding: 100px 2rem 80px; max-width: 800px; margin: 0 auto; text-align: center; }
-  .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 100px; padding: 5px 14px; font-size: 12px; color: var(--text2); margin-bottom: 28px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; animation: fadeUp 0.6s ease both; }
-  .hero-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--tip); animation: pulse 2s ease infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  h1 { font-family: 'Instrument Serif', serif; font-size: clamp(44px, 8vw, 72px); line-height: 1.05; letter-spacing: -0.03em; color: var(--text); margin-bottom: 20px; animation: fadeUp 0.6s ease 0.1s both; }
-  h1 em { font-style: italic; color: var(--text2); }
-  .hero-sub { font-size: 18px; color: var(--text2); font-weight: 300; max-width: 520px; margin: 0 auto 40px; animation: fadeUp 0.6s ease 0.2s both; }
-  .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; animation: fadeUp 0.6s ease 0.3s both; }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.15s ease; font-family: 'DM Sans', sans-serif; border: none; }
-  .btn-primary { background: var(--text); color: var(--bg); }
-  .btn-primary:hover { background: #d4d1cc; transform: translateY(-1px); }
-  .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border2); }
-  .btn-secondary:hover { background: var(--bg3); }
-  .glow-line { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, var(--border2) 30%, var(--border2) 70%, transparent); }
+    html {
+      scroll-behavior: smooth;
+    }
 
-  /* SECTIONS */
-  .section { max-width: 1000px; margin: 0 auto; padding: 80px 2rem; }
-  .section-header { margin-bottom: 48px; }
-  .section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 10px; font-weight: 500; }
-  h2 { font-family: 'Instrument Serif', serif; font-size: clamp(30px, 5vw, 42px); letter-spacing: -0.02em; line-height: 1.1; color: var(--text); }
-  h2 + p { color: var(--text2); font-weight: 300; margin-top: 12px; max-width: 560px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-  /* CALLOUT CARDS GRID */
-  .callout-grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
-  .callout-card-big {
-    background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
-    padding: 24px 20px 20px; cursor: pointer; transition: all 0.2s ease;
-    display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;
-  }
-  .callout-card-big::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity 0.2s; }
-  .callout-card-big:hover { transform: translateY(-3px); border-color: var(--border2); }
-  .ccb-icon { font-size: 28px; line-height: 1; }
-  .ccb-name { font-size: 15px; font-weight: 500; }
-  .ccb-desc { font-size: 12px; color: var(--text3); line-height: 1.5; }
-  .ccb-cta { font-size: 11px; color: var(--text3); margin-top: auto; padding-top: 8px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .ccb-cta span { transition: transform 0.15s; display: inline-block; }
-  .callout-card-big:hover .ccb-cta span { transform: translateX(3px); }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 900;
+      opacity: 0.5;
+    }
 
-  .ccb-note { border-color: var(--note-border); }
-  .ccb-note .ccb-name { color: var(--note); }
-  .ccb-tip { border-color: var(--tip-border); }
-  .ccb-tip .ccb-name { color: var(--tip); }
-  .ccb-important { border-color: var(--important-border); }
-  .ccb-important .ccb-name { color: var(--important); }
-  .ccb-warning { border-color: var(--warning-border); }
-  .ccb-warning .ccb-name { color: var(--warning); }
-  .ccb-caution { border-color: var(--caution-border); }
-  .ccb-caution .ccb-name { color: var(--caution); }
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      background: rgba(14, 14, 17, 0.9);
+      backdrop-filter: blur(16px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
 
-  /* MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
-    z-index: 500; display: flex; align-items: center; justify-content: center;
-    padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
-  }
-  .modal-overlay.open { opacity: 1; pointer-events: all; }
-  .modal {
-    background: var(--bg2); border: 1px solid var(--border2); border-radius: 18px;
-    width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto;
-    position: relative; transform: translateY(30px) scale(0.97);
-    transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1), opacity 0.25s ease;
-    opacity: 0;
-  }
-  .modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+    .logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  .modal-close {
-    position: absolute; top: 16px; right: 16px;
-    width: 34px; height: 34px; border-radius: 50%;
-    background: var(--bg3); border: 1px solid var(--border2);
-    color: var(--text2); font-size: 18px; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s; z-index: 10; line-height: 1;
-  }
-  .modal-close:hover { background: var(--bg); color: var(--text); }
+    .logo-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--tip);
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 2s ease infinite;
+    }
 
-  .modal-header { padding: 32px 32px 24px; border-bottom: 1px solid var(--border); }
-  .modal-icon { font-size: 42px; margin-bottom: 14px; line-height: 1; }
-  .modal-title { font-family: 'Instrument Serif', serif; font-size: 32px; letter-spacing: -0.02em; margin-bottom: 6px; }
-  .modal-subtitle { font-size: 14px; color: var(--text2); font-weight: 300; }
+    nav {
+      display: flex;
+      gap: 4px;
+    }
 
-  .modal-body { padding: 28px 32px 32px; display: flex; flex-direction: column; gap: 28px; }
+    nav a {
+      color: var(--text2);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
 
-  .modal-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 10px; }
+    nav a:hover {
+      color: var(--text);
+      background: var(--bg3);
+    }
 
-  .modal-when { font-size: 14px; color: var(--text2); line-height: 1.7; }
-  .modal-when strong { color: var(--text); font-weight: 500; }
+    /* HERO */
+    .hero {
+      padding: 100px 2rem 80px;
+      max-width: 800px;
+      margin: 0 auto;
+      text-align: center;
+    }
 
-  .modal-rendered { border-left: 3px solid; border-radius: 0 8px 8px 0; padding: 14px 18px; }
-  .modal-rendered-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-  .modal-rendered-body { font-size: 14px; line-height: 1.65; color: var(--text); }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 28px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 500;
+      animation: fadeUp 0.6s ease both;
+    }
 
-  .modal-code { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .modal-code-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  .modal-code-lang { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
-  .modal-code-copy { font-size: 11px; padding: 4px 10px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 5px; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-  .modal-code-copy:hover { color: var(--text); }
-  pre.modal-pre { padding: 16px; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.7; color: var(--text2); background: none; border: none; border-radius: 0; overflow-x: auto; margin: 0; }
-  .kw { color: #a78bfa; } .str { color: #6ee7b7; } .cm { color: #4b5563; font-style: italic; }
+    .hero-tag::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--tip);
+      animation: pulse 2s ease infinite;
+    }
 
-  .modal-tips { display: flex; flex-direction: column; gap: 8px; }
-  .modal-tip { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text2); line-height: 1.6; }
-  .modal-tip::before { content: '→'; color: var(--text3); flex-shrink: 0; margin-top: 1px; }
+    @keyframes pulse {
 
-  /* SINTAXIS */
-  .syntax-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 640px) { .syntax-grid { grid-template-columns: 1fr; } }
-  .syntax-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
-  .syntax-card h3 { font-size: 14px; font-weight: 500; color: var(--text2); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-  .syntax-card h3 .step { width: 20px; height: 20px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text3); flex-shrink: 0; }
-  pre { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; color: var(--text2); }
-  code { font-family: 'DM Mono', monospace; background: var(--bg3); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; font-size: 0.9em; color: var(--text2); }
+      0%,
+      100% {
+        opacity: 1;
+      }
 
-  /* GENERADOR */
-  #generador { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .gen-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; }
-  @media (max-width: 700px) { .gen-layout { grid-template-columns: 1fr; } nav { display: none; } }
-  .gen-panel { display: flex; flex-direction: column; gap: 16px; }
-  .gen-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 4px; }
-  .gen-sublabel { font-size: 12px; color: var(--text3); margin-bottom: 8px; line-height: 1.5; }
-  .type-selector { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-  .type-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text3); cursor: pointer; transition: all 0.15s; font-size: 11px; font-family: 'DM Sans', sans-serif; }
-  .type-btn .t-icon { font-size: 18px; }
-  .type-btn:hover { border-color: var(--border2); color: var(--text2); background: var(--bg3); }
-  textarea { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 0 0 var(--radius) var(--radius); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; padding: 14px; resize: vertical; min-height: 240px; line-height: 1.65; transition: border-color 0.15s; outline: none; }
-  textarea:focus { border-color: var(--border2); }
-  textarea::placeholder { color: var(--text3); }
-  .editor-topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border: 1px solid var(--border); border-bottom: none; border-radius: var(--radius) var(--radius) 0 0; background: rgba(0,0,0,0.15); }
-  .editor-topbar-label { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; letter-spacing: 0.05em; }
-  .output-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  .output-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); }
-  .output-tabs { display: flex; gap: 2px; }
-  .output-tab { font-size: 12px; padding: 4px 10px; border-radius: 5px; cursor: pointer; color: var(--text3); border: none; background: none; font-family: 'DM Sans', sans-serif; transition: all 0.12s; }
-  .output-tab:hover { color: var(--text2); }
-  .output-tab.ot-active { background: var(--bg2); color: var(--text); }
-  .copy-btn2 { font-size: 12px; padding: 5px 12px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
-  .copy-btn2:hover { color: var(--text); }
-  .output-content { padding: 16px; font-family: 'DM Mono', monospace; font-size: 13px; line-height: 1.65; color: var(--text2); white-space: pre-wrap; word-break: break-word; min-height: 240px; }
-  .preview-content { padding: 16px; display: none; min-height: 240px; display: none; flex-direction: column; gap: 10px; }
-  .preview-rendered {
-    border-left: 4px solid;
-    padding: 14px 18px;
-    border-radius: 0 8px 8px 0;
-    font-family: 'DM Sans', sans-serif;
-    margin-bottom: 8px;
-  }
-  .preview-rendered:last-child { margin-bottom: 0; }
-  .preview-rendered-title {
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    letter-spacing: 0;
-    text-transform: none;
-  }
-  .preview-rendered-title svg { width: 16px; height: 16px; fill: currentColor; display: block; flex-shrink: 0; }
-  .preview-rendered-body { font-size: 14px; line-height: 1.7; color: var(--text); }
-  .preview-normal-text { font-size: 14px; color: var(--text2); line-height: 1.6; padding: 0 4px; margin-bottom: 8px; }
-  /* Etiqueta "GitHub preview" */
-  .preview-gh-label {
-    font-size: 11px; color: var(--text3); margin-bottom: 12px;
-    display: flex; align-items: center; gap: 6px;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .preview-gh-label::before {
-    content: '';
-    display: inline-block; width: 14px; height: 14px;
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%235c5956' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/%3E%3C/svg%3E") no-repeat center / contain;
-    opacity: 0.6;
-  }
+      50% {
+        opacity: 0.3;
+      }
+    }
 
-  /* TIPS */
-  .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 40px; }
-  .tip-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-  .tip-card-num { font-family: 'Instrument Serif', serif; font-size: 32px; color: var(--text3); line-height: 1; margin-bottom: 10px; }
-  .tip-card h4 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
-  .tip-card p { font-size: 13px; color: var(--text2); line-height: 1.6; }
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(44px, 8vw, 72px);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 20px;
+      animation: fadeUp 0.6s ease 0.1s both;
+    }
 
-  footer { border-top: 1px solid var(--border); padding: 40px 2rem; text-align: center; color: var(--text3); font-size: 13px; }
-  footer a { color: var(--text3); text-decoration: underline; text-underline-offset: 3px; }
-  footer a:hover { color: var(--text2); }
-  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
-  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
-  .reveal.visible { opacity: 1; transform: none; }
-</style>
+    h1 em {
+      font-style: italic;
+      color: var(--text2);
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--text2);
+      font-weight: 300;
+      max-width: 520px;
+      margin: 0 auto 40px;
+      animation: fadeUp 0.6s ease 0.2s both;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      font-family: 'DM Sans', sans-serif;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .btn-primary:hover {
+      background: #d4d1cc;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg3);
+    }
+
+    .glow-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2) 30%, var(--border2) 70%, transparent);
+    }
+
+    /* SECTIONS */
+    .section {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 80px 2rem;
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text3);
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    h2 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(30px, 5vw, 42px);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    h2+p {
+      color: var(--text2);
+      font-weight: 300;
+      margin-top: 12px;
+      max-width: 560px;
+    }
+
+    /* CALLOUT CARDS GRID */
+    .callout-grid-5 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+    }
+
+    .callout-card-big {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 20px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .callout-card-big::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .callout-card-big:hover {
+      transform: translateY(-3px);
+      border-color: var(--border2);
+    }
+
+    .ccb-icon {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .ccb-name {
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .ccb-desc {
+      font-size: 12px;
+      color: var(--text3);
+      line-height: 1.5;
+    }
+
+    .ccb-cta {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ccb-cta span {
+      transition: transform 0.15s;
+      display: inline-block;
+    }
+
+    .callout-card-big:hover .ccb-cta span {
+      transform: translateX(3px);
+    }
+
+    .ccb-note {
+      border-color: var(--note-border);
+    }
+
+    .ccb-note .ccb-name {
+      color: var(--note);
+    }
+
+    .ccb-tip {
+      border-color: var(--tip-border);
+    }
+
+    .ccb-tip .ccb-name {
+      color: var(--tip);
+    }
+
+    .ccb-important {
+      border-color: var(--important-border);
+    }
+
+    .ccb-important .ccb-name {
+      color: var(--important);
+    }
+
+    .ccb-warning {
+      border-color: var(--warning-border);
+    }
+
+    .ccb-warning .ccb-name {
+      color: var(--warning);
+    }
+
+    .ccb-caution .ccb-name {
+      color: var(--caution);
+    }
+
+    .ccb-header {
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+
+    .ccb-header .ccb-name {
+      color: #6366f1;
+    }
+
+    .ccb-divider {
+      border-color: var(--border2);
+    }
+
+    .ccb-divider .ccb-name {
+      color: var(--text2);
+    }
+
+    .ccb-bold {
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .ccb-bold .ccb-name {
+      color: #f59e0b;
+    }
+
+    .ccb-code {
+      border-color: rgba(217, 70, 239, 0.35);
+    }
+
+    .ccb-code .ccb-name {
+      color: #d946ef;
+    }
+
+    .ccb-list {
+      border-color: rgba(20, 184, 166, 0.35);
+    }
+
+    .ccb-list .ccb-name {
+      color: #14b8a6;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 660px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      transform: translateY(30px) scale(0.97);
+      transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease;
+      opacity: 0;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      z-index: 10;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .modal-header {
+      padding: 32px 32px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-icon {
+      font-size: 42px;
+      margin-bottom: 14px;
+      line-height: 1;
+    }
+
+    .modal-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 32px;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      font-size: 14px;
+      color: var(--text2);
+      font-weight: 300;
+    }
+
+    .modal-body {
+      padding: 28px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .modal-section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text3);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .modal-when {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.7;
+    }
+
+    .modal-when strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .modal-rendered {
+      border-left: 3px solid;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+    }
+
+    .modal-rendered-title {
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-rendered-body {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    .modal-code {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .modal-code-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-code-lang {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .modal-code-copy {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 5px;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .modal-code-copy:hover {
+      color: var(--text);
+    }
+
+    pre.modal-pre {
+      padding: 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--text2);
+      background: none;
+      border: none;
+      border-radius: 0;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    .kw {
+      color: #a78bfa;
+    }
+
+    .str {
+      color: #6ee7b7;
+    }
+
+    .cm {
+      color: #4b5563;
+      font-style: italic;
+    }
+
+    .modal-tips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .modal-tip {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    .modal-tip::before {
+      content: '→';
+      color: var(--text3);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* SINTAXIS */
+    .syntax-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .syntax-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .syntax-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+    }
+
+    .syntax-card h3 {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .syntax-card h3 .step {
+      width: 20px;
+      height: 20px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text3);
+      flex-shrink: 0;
+    }
+
+    pre {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text2);
+    }
+
+    code {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: var(--text2);
+    }
+
+    /* GENERADOR */
+    #generador {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .gen-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 700px) {
+      .gen-layout {
+        grid-template-columns: 1fr;
+      }
+
+      nav {
+        display: none;
+      }
+    }
+
+    .gen-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .gen-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text3);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .gen-sublabel {
+      font-size: 12px;
+      color: var(--text3);
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .type-selector {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .type-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text3);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 11px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .type-btn .t-icon {
+      font-size: 18px;
+    }
+
+    .type-btn:hover {
+      border-color: var(--border2);
+      color: var(--text2);
+      background: var(--bg3);
+    }
+
+    textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      padding: 14px;
+      resize: vertical;
+      min-height: 240px;
+      line-height: 1.65;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: var(--border2);
+    }
+
+    textarea::placeholder {
+      color: var(--text3);
+    }
+
+    .editor-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: var(--radius) var(--radius) 0 0;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .editor-topbar-label {
+      font-size: 11px;
+      color: var(--text3);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.05em;
+    }
+
+    .output-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .output-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .output-tabs {
+      display: flex;
+      gap: 2px;
+    }
+
+    .output-tab {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      color: var(--text3);
+      border: none;
+      background: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.12s;
+    }
+
+    .output-tab:hover {
+      color: var(--text2);
+    }
+
+    .output-tab.ot-active {
+      background: var(--bg2);
+      color: var(--text);
+    }
+
+    .copy-btn2 {
+      font-size: 12px;
+      padding: 5px 12px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .copy-btn2:hover {
+      color: var(--text);
+    }
+
+    .output-content {
+      padding: 16px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text2);
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: 240px;
+    }
+
+    .preview-content {
+      padding: 16px;
+      display: none;
+      min-height: 240px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .preview-rendered {
+      border-left: 4px solid;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 8px;
+    }
+
+    .preview-rendered:last-child {
+      margin-bottom: 0;
+    }
+
+    .preview-rendered-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .preview-rendered-title svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .preview-rendered-body {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    .preview-normal-text {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+      padding: 0 4px;
+      margin-bottom: 8px;
+    }
+
+    .preview-normal-text h1,
+    .preview-normal-text h2,
+    .preview-normal-text h3,
+    .preview-normal-text h4 {
+      font-family: 'Instrument Serif', serif;
+      color: var(--text);
+      line-height: 1.2;
+      margin: 10px 0 6px;
+    }
+
+    .preview-normal-text h1 {
+      font-size: 26px;
+      letter-spacing: -0.02em;
+      padding-bottom: 6px;
+    }
+
+    .preview-normal-text h2 {
+      font-size: 20px;
+      letter-spacing: -0.01em;
+      padding-bottom: 4px;
+    }
+
+    .preview-normal-text h3 {
+      font-size: 16px;
+    }
+
+    .preview-normal-text h4 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .preview-normal-text hr {
+      border: none;
+      border-top: 2px solid rgba(255, 255, 255, 0.35);
+      margin: 12px 0;
+    }
+
+    .preview-normal-text strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .preview-normal-text em {
+      font-style: italic;
+      color: var(--text2);
+    }
+
+    .preview-normal-text code {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.88em;
+      color: #a78bfa;
+    }
+
+    .preview-normal-text a {
+      color: var(--note);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .preview-normal-text ul,
+    .preview-normal-text ol {
+      padding-left: 20px;
+    }
+
+    .preview-normal-text li {
+      margin-bottom: 2px;
+    }
+
+    /* Etiqueta "GitHub preview" */
+    .preview-gh-label {
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .preview-gh-label::before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='%235c5956' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/%3E%3C/svg%3E") no-repeat center / contain;
+      opacity: 0.6;
+    }
+
+    /* TIPS */
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 40px;
+    }
+
+    .tip-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .tip-card-num {
+      font-family: 'Instrument Serif', serif;
+      font-size: 32px;
+      color: var(--text3);
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .tip-card h4 {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .tip-card p {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 2rem;
+      text-align: center;
+      color: var(--text3);
+      font-size: 13px;
+    }
+
+    footer a {
+      color: var(--text3);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    footer a:hover {
+      color: var(--text2);
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <a href="#" class="logo"><span class="logo-dot"></span> Callouts MD</a>
-  <nav>
-    <a href="#tipos">Tipos</a>
-    <a href="#sintaxis">Sintaxis</a>
-    <a href="#generador">Generador</a>
-    <a href="#consejos">Consejos</a>
-  </nav>
-</header>
+  <header>
+    <a href="#" class="logo"><span class="logo-dot"></span> Callouts MD</a>
+    <nav>
+      <a href="#tipos">Tipos</a>
+      <a href="#sintaxis">Sintaxis</a>
+      <a href="#generador">Generador</a>
+    </nav>
+  </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-tag">Guía completa de Markdown</div>
-  <h1>Los callouts<br><em>que llaman la atención</em></h1>
-  <p class="hero-sub">Aprende a usar alertas y callouts en Markdown. Resalta lo que importa: notas, consejos, advertencias y más.</p>
-  <div class="hero-ctas">
-    <a href="#generador" class="btn btn-primary">Ir al generador →</a>
-    <a href="#tipos" class="btn btn-secondary">Ver los tipos</a>
-  </div>
-</section>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tag">Guía completa de Markdown</div>
+    <h1>Los callouts<br><em>que llaman la atención</em></h1>
+    <p class="hero-sub">Aprende a usar alertas y callouts en Markdown. Resalta lo que importa: notas, consejos,
+      advertencias y más.</p>
+    <div class="hero-ctas">
+      <a href="#generador" class="btn btn-primary">Ir al generador →</a>
+      <a href="#tipos" class="btn btn-secondary">Ver los tipos</a>
+    </div>
+  </section>
 
-<div class="glow-line"></div>
+  <div class="glow-line"></div>
 
-<!-- TIPOS -->
-<section id="tipos" class="section">
-  <div class="section-header reveal">
-    <div class="section-label">Los 5 tipos</div>
-    <h2>¿Qué tipo de callout necesitas?</h2>
-    <p>Haz clic en cualquier tipo para ver su explicación completa, ejemplos y código.</p>
-  </div>
-
-  <div class="callout-grid-5 reveal">
-
-    <div class="callout-card-big ccb-note" onclick="openModal('NOTE')">
-      <div class="ccb-icon">ℹ️</div>
-      <div class="ccb-name">NOTE</div>
-      <div class="ccb-desc">Información útil que el lector debería tener en cuenta</div>
-      <div class="ccb-cta">Ver detalles <span>→</span></div>
+  <!-- TIPOS -->
+  <section id="tipos" class="section">
+    <div class="section-header reveal">
+      <div class="section-label">Los 5 tipos</div>
+      <h2>¿Qué tipo de callout necesitas?</h2>
+      <p>Haz clic en cualquier tipo para ver su explicación completa, ejemplos y código.</p>
     </div>
 
-    <div class="callout-card-big ccb-tip" onclick="openModal('TIP')">
-      <div class="ccb-icon">💡</div>
-      <div class="ccb-name">TIP</div>
-      <div class="ccb-desc">Consejo opcional que puede mejorar la experiencia</div>
-      <div class="ccb-cta">Ver detalles <span>→</span></div>
-    </div>
+    <div class="callout-grid-5 reveal">
 
-    <div class="callout-card-big ccb-important" onclick="openModal('IMPORTANT')">
-      <div class="ccb-icon">📣</div>
-      <div class="ccb-name">IMPORTANT</div>
-      <div class="ccb-desc">Información crucial para que el proceso funcione</div>
-      <div class="ccb-cta">Ver detalles <span>→</span></div>
-    </div>
-
-    <div class="callout-card-big ccb-warning" onclick="openModal('WARNING')">
-      <div class="ccb-icon">⚠️</div>
-      <div class="ccb-name">WARNING</div>
-      <div class="ccb-desc">Riesgo potencial que requiere atención inmediata</div>
-      <div class="ccb-cta">Ver detalles <span>→</span></div>
-    </div>
-
-    <div class="callout-card-big ccb-caution" onclick="openModal('CAUTION')">
-      <div class="ccb-icon">🔴</div>
-      <div class="ccb-name">CAUTION</div>
-      <div class="ccb-desc">Consecuencia negativa si se realiza una acción incorrecta</div>
-      <div class="ccb-cta">Ver detalles <span>→</span></div>
-    </div>
-
-  </div>
-</section>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
-  <div class="modal" id="modal">
-    <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
-    <div class="modal-header">
-      <div class="modal-icon" id="mIcon"></div>
-      <div class="modal-title" id="mTitle"></div>
-      <div class="modal-subtitle" id="mSubtitle"></div>
-    </div>
-    <div class="modal-body">
-      <div>
-        <div class="modal-section-label">¿Cuándo usarlo?</div>
-        <div class="modal-when" id="mWhen"></div>
+      <div class="callout-card-big ccb-note" onclick="openModal('NOTE')">
+        <div class="ccb-icon">ℹ️</div>
+        <div class="ccb-name">NOTE</div>
+        <div class="ccb-desc">Información útil que el lector debería tener en cuenta</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
       </div>
-      <div>
-        <div class="modal-section-label">Aspecto renderizado</div>
-        <div class="modal-rendered" id="mRendered">
-          <div class="modal-rendered-title" id="mRenderedTitle"></div>
-          <div class="modal-rendered-body" id="mRenderedBody"></div>
+
+      <div class="callout-card-big ccb-tip" onclick="openModal('TIP')">
+        <div class="ccb-icon">💡</div>
+        <div class="ccb-name">TIP</div>
+        <div class="ccb-desc">Consejo opcional que puede mejorar la experiencia</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+      <div class="callout-card-big ccb-important" onclick="openModal('IMPORTANT')">
+        <div class="ccb-icon">📣</div>
+        <div class="ccb-name">IMPORTANT</div>
+        <div class="ccb-desc">Información crucial para que el proceso funcione</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+      <div class="callout-card-big ccb-warning" onclick="openModal('WARNING')">
+        <div class="ccb-icon">⚠️</div>
+        <div class="ccb-name">WARNING</div>
+        <div class="ccb-desc">Riesgo potencial que requiere atención inmediata</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+      <div class="callout-card-big ccb-caution" onclick="openModal('CAUTION')">
+        <div class="ccb-icon">🔴</div>
+        <div class="ccb-name">CAUTION</div>
+        <div class="ccb-desc">Consecuencia negativa si se realiza una acción incorrecta</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN OTROS ELEMENTOS MARKDOWN -->
+    <div style="height: 48px;"></div>
+
+    <div class="section-header reveal">
+      <div class="section-label">Formato Markdown</div>
+      <h2>Otros elementos esenciales</h2>
+      <p>Haz clic en cualquier elemento para ver su explicación completa, ejemplos y código.</p>
+    </div>
+
+    <div class="callout-grid-5 reveal">
+
+      <div class="callout-card-big ccb-header" onclick="openModal('HEADER')">
+        <div class="ccb-icon">#️⃣</div>
+        <div class="ccb-name">ENCABEZADOS</div>
+        <div class="ccb-desc">Títulos de diferentes tamaños (H1 a H4)</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+      <div class="callout-card-big ccb-divider" onclick="openModal('DIVIDER')">
+        <div class="ccb-icon">➖</div>
+        <div class="ccb-name">SEPARADORES</div>
+        <div class="ccb-desc">Líneas horizontales divisoras de secciones</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+      <div class="callout-card-big ccb-bold" onclick="openModal('BOLD')">
+        <div class="ccb-icon"><b>B</b></div>
+        <div class="ccb-name">NEGRILLA</div>
+        <div class="ccb-desc">Resaltar palabras importantes en el texto</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+      <div class="callout-card-big ccb-code" onclick="openModal('CODE')">
+        <div class="ccb-icon">💻</div>
+        <div class="ccb-name">CÓDIGO INLINE</div>
+        <div class="ccb-desc">Dar formato de código monoespaciado a palabras</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+      <div class="callout-card-big ccb-list" onclick="openModal('LIST')">
+        <div class="ccb-icon">📋</div>
+        <div class="ccb-name">LISTAS</div>
+        <div class="ccb-desc">Listas numeradas o con viñetas</div>
+        <div class="ccb-cta">Ver detalles <span>→</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+    <div class="modal" id="modal">
+      <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">✕</button>
+      <div class="modal-header">
+        <div class="modal-icon" id="mIcon"></div>
+        <div class="modal-title" id="mTitle"></div>
+        <div class="modal-subtitle" id="mSubtitle"></div>
+      </div>
+      <div class="modal-body">
+        <div>
+          <div class="modal-section-label">¿Cuándo usarlo?</div>
+          <div class="modal-when" id="mWhen"></div>
         </div>
-      </div>
-      <div>
-        <div class="modal-section-label">Código Markdown</div>
-        <div class="modal-code">
-          <div class="modal-code-bar">
-            <span class="modal-code-lang">markdown</span>
-            <button class="modal-code-copy" onclick="copyModalCode()">Copiar</button>
+        <div>
+          <div class="modal-section-label">Aspecto renderizado</div>
+          <div class="modal-rendered" id="mRendered">
+            <div class="modal-rendered-title" id="mRenderedTitle"></div>
+            <div class="modal-rendered-body" id="mRenderedBody"></div>
           </div>
-          <pre class="modal-pre" id="mCode"></pre>
+        </div>
+        <div>
+          <div class="modal-section-label">Código Markdown</div>
+          <div class="modal-code">
+            <div class="modal-code-bar">
+              <span class="modal-code-lang">markdown</span>
+              <button class="modal-code-copy" onclick="copyModalCode()">Copiar</button>
+            </div>
+            <pre class="modal-pre" id="mCode"></pre>
+          </div>
+        </div>
+        <div>
+          <div class="modal-section-label">Consejos de uso</div>
+          <div class="modal-tips" id="mTips"></div>
         </div>
       </div>
-      <div>
-        <div class="modal-section-label">Consejos de uso</div>
-        <div class="modal-tips" id="mTips"></div>
+    </div>
+  </div>
+
+  <!-- MODAL DE PREVISUALIZACIÓN AMPLIADA -->
+  <div class="modal-overlay" id="previewExpandOverlay" onclick="handlePreviewOverlayClick(event)">
+    <div class="modal" id="previewExpandModal"
+      style="max-width: 90%; width: 90%; height: 85vh; display: flex; flex-direction: column;">
+      <button class="modal-close" onclick="closePreviewModal()" aria-label="Cerrar">✕</button>
+      <div class="modal-header" style="padding: 20px 32px 14px; flex-shrink: 0;">
+        <div class="modal-title" style="font-size: 24px;">Previsualización en Grande</div>
+        <div class="modal-subtitle">Aspecto final del documento renderizado</div>
+      </div>
+      <div class="modal-body" id="expandedPreviewBody"
+        style="overflow-y: auto; flex-grow: 1; padding: 20px 32px 32px; background: var(--bg); border-top: 1px solid var(--border); border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;">
       </div>
     </div>
   </div>
-</div>
 
-<hr class="divider">
+  <hr class="divider">
 
-<!-- SINTAXIS -->
-<section id="sintaxis" class="section">
-  <div class="section-header reveal">
-    <div class="section-label">Cómo escribirlos</div>
-    <h2>La sintaxis paso a paso</h2>
-    <p>Los callouts usan la sintaxis de blockquote de Markdown, extendida con una etiqueta especial.</p>
-  </div>
-  <div class="syntax-grid reveal">
-    <div class="syntax-card">
-      <h3><span class="step">1</span> Estructura básica</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Comienza con <code>&gt;</code> seguido de <code>[!TIPO]</code>. El contenido va en las líneas siguientes con <code>&gt;</code>.</p>
-      <pre><span class="kw">&gt; [!NOTE]</span>  
-<span class="str">&gt; Tu mensaje aquí.</span>  </pre>
+  <!-- SINTAXIS -->
+  <section id="sintaxis" class="section">
+    <div class="section-header reveal">
+      <div class="section-label">Cómo escribirlos</div>
+      <h2>La sintaxis paso a paso</h2>
+      <p>Los callouts usan la sintaxis de blockquote de Markdown, extendida con una etiqueta especial.</p>
     </div>
-    <div class="syntax-card">
-      <h3><span class="step">2</span> Saltos de línea</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Añade <strong>dos espacios</strong> al final de cada línea para crear un salto de línea explícito.</p>
-      <pre><span class="kw">&gt; [!TIP]</span>  
+    <div class="syntax-grid reveal">
+      <div class="syntax-card">
+        <h3><span class="step">1</span> Estructura básica</h3>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Comienza con <code>&gt;</code> seguido de
+          <code>[!TIPO]</code>. El contenido va en las líneas siguientes con <code>&gt;</code>.
+        </p>
+        <pre><span class="kw">&gt; [!NOTE]</span>  
+<span class="str">&gt; Tu mensaje aquí.</span>  </pre>
+      </div>
+      <div class="syntax-card">
+        <h3><span class="step">2</span> Saltos de línea</h3>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Añade <strong>dos espacios</strong> al final de
+          cada línea para crear un salto de línea explícito.</p>
+        <pre><span class="kw">&gt; [!TIP]</span>  
 <span class="str">&gt; Primera línea.</span>  
 <span class="str">&gt; Segunda línea.</span>  </pre>
-    </div>
-    <div class="syntax-card">
-      <h3><span class="step">3</span> Varios párrafos</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Para párrafos separados añade una línea vacía con solo <code>&gt;</code> entre ellos.</p>
-      <pre><span class="kw">&gt; [!IMPORTANT]</span>  
+      </div>
+      <div class="syntax-card">
+        <h3><span class="step">3</span> Varios párrafos</h3>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Para párrafos separados añade una línea vacía
+          con solo <code>&gt;</code> entre ellos.</p>
+        <pre><span class="kw">&gt; [!IMPORTANT]</span>  
 <span class="str">&gt; Primer párrafo.</span>  
 <span class="cm">&gt;</span>
 <span class="str">&gt; Segundo párrafo.</span>  </pre>
-    </div>
-    <div class="syntax-card">
-      <h3><span class="step">4</span> Compatibilidad</h3>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Funciona de forma nativa en GitHub. Para Next.js y otros entornos usa el plugin <code>rehype-github-alerts</code>.</p>
-      <pre><span class="cm"># next.config.mjs</span>
+      </div>
+      <div class="syntax-card">
+        <h3><span class="step">4</span> Compatibilidad</h3>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Funciona de forma nativa en GitHub. Para
+          Next.js y otros entornos usa el plugin <code>rehype-github-alerts</code>.</p>
+        <pre><span class="cm"># next.config.mjs</span>
 <span class="kw">import</span> { rehypeGithubAlerts } 
   <span class="kw">from</span> <span class="str">'rehype-github-alerts'</span>
 </pre>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<hr class="divider">
+  <hr class="divider">
 
-<!-- GENERADOR -->
-<section id="generador">
-  <div class="section">
-    <div class="section-header reveal">
-      <div class="section-label">Herramienta</div>
-      <h2>Generador inteligente</h2>
-      <p>Escribe Markdown libremente. Los botones insertan etiquetas, el sistema auto-corrige los <code>&gt;</code> que falten y puedes mezclar varios callouts en un mismo documento.</p>
-    </div>
-    <div class="gen-layout reveal">
-      <div class="gen-panel">
-        <div>
-          <div class="gen-label">Insertar etiqueta</div>
-          <div class="gen-sublabel">Haz clic para insertar un callout en la posición del cursor</div>
-          <div class="type-selector">
-            <button class="type-btn" onclick="insertCallout('NOTE')"><span class="t-icon">ℹ️</span>Note</button>
-            <button class="type-btn" onclick="insertCallout('TIP')"><span class="t-icon">💡</span>Tip</button>
-            <button class="type-btn" onclick="insertCallout('IMPORTANT')"><span class="t-icon">📣</span>Important</button>
-            <button class="type-btn" onclick="insertCallout('WARNING')"><span class="t-icon">⚠️</span>Warning</button>
-            <button class="type-btn" onclick="insertCallout('CAUTION')"><span class="t-icon">🔴</span>Caution</button>
+  <!-- GENERADOR -->
+  <section id="generador">
+    <div class="section">
+      <div class="section-header reveal">
+        <div class="section-label">Herramienta</div>
+        <h2>Generador inteligente</h2>
+        <p>Escribe Markdown libremente. Los botones insertan etiquetas, el sistema auto-corrige los <code>&gt;</code>
+          que falten y puedes mezclar varios callouts en un mismo documento.</p>
+      </div>
+      <div class="gen-layout reveal">
+        <div class="gen-panel">
+          <div>
+            <div class="gen-label">Insertar etiqueta</div>
+            <div class="gen-sublabel">Haz clic para insertar un callout en la posición del cursor</div>
+            <div class="type-selector">
+              <button class="type-btn" onclick="insertCallout('NOTE')"><span class="t-icon">ℹ️</span>Note</button>
+              <button class="type-btn" onclick="insertCallout('TIP')"><span class="t-icon">💡</span>Tip</button>
+              <button class="type-btn" onclick="insertCallout('IMPORTANT')"><span
+                  class="t-icon">📣</span>Important</button>
+              <button class="type-btn" onclick="insertCallout('WARNING')"><span class="t-icon">⚠️</span>Warning</button>
+              <button class="type-btn" onclick="insertCallout('CAUTION')"><span class="t-icon">🔴</span>Caution</button>
+            </div>
           </div>
-        </div>
-        <div>
-          <div class="editor-topbar">
-            <span class="editor-topbar-label">EDITOR MARKDOWN EN VIVO</span>
-            <span style="font-size:11px;color:var(--text3);">↵ dentro de un callout añade <code style="font-size:10px;">&gt;</code> auto</span>
+          <div style="margin-top: 14px;">
+            <div class="gen-label">Insertar formato</div>
+            <div class="gen-sublabel">Haz clic para añadir elementos Markdown al texto</div>
+            <div class="type-selector">
+              <button class="type-btn" onclick="insertFormat('HEADER')"><span class="t-icon">#️⃣</span>Título</button>
+              <button class="type-btn" onclick="insertFormat('DIVIDER')"><span class="t-icon">➖</span>Línea</button>
+              <button class="type-btn" onclick="insertFormat('BOLD')"><span
+                  class="t-icon"><b>B</b></span>Negrita</button>
+              <button class="type-btn" onclick="insertFormat('CODE')"><span class="t-icon">💻</span>Código</button>
+              <button class="type-btn" onclick="insertFormat('LIST')"><span class="t-icon">📋</span>Lista</button>
+            </div>
           </div>
-          <textarea id="genText" oninput="updateGen()">> [!NOTE]  
+          <div>
+            <div class="editor-topbar" style="display: flex; align-items: center; justify-content: space-between;">
+              <span class="editor-topbar-label">EDITOR MARKDOWN EN VIVO</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <button id="exitCalloutBtn" onclick="exitCallout()"
+                  style="display: none; font-size: 11px; padding: 2px 8px; background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 5px; color: #f87171; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; font-weight: 500;">Salir
+                  de callout 🚪</button>
+                <span style="font-size:11px;color:var(--text3);">↵ dentro de un callout añade <code
+                    style="font-size:10px;">&gt;</code> auto</span>
+              </div>
+            </div>
+            <textarea id="genText"
+              oninput="updateGen()">> [!NOTE]  
 > Recuerda hacer commit de tus cambios antes de actualizar las dependencias.
 
 > [!WARNING]  
 > Esta operación eliminará permanentemente todos los registros. Haz una copia de seguridad antes de continuar.</textarea>
+          </div>
         </div>
-      </div>
-      <div class="gen-panel">
-        <div class="gen-label">Resultado</div>
-        <div class="output-block">
-          <div class="output-topbar">
-            <div class="output-tabs">
-              <button class="output-tab ot-active" id="tabCode" onclick="switchOutputTab('code', this)">Código limpio</button>
-              <button class="output-tab" id="tabPreview" onclick="switchOutputTab('preview', this)">Previsualización</button>
+        <div class="gen-panel">
+          <div class="gen-label">Resultado</div>
+          <div class="output-block">
+            <div class="output-topbar">
+              <div class="output-tabs">
+                <button class="output-tab ot-active" id="tabCode" onclick="switchOutputTab('code', this)">Código
+                  limpio</button>
+                <button class="output-tab" id="tabPreview"
+                  onclick="switchOutputTab('preview', this)">Previsualización</button>
+              </div>
+              <button class="copy-btn2" id="copyBtn" onclick="copyGen()">Copiar</button>
+              <button class="copy-btn2" id="expandBtn" onclick="expandPreview()"
+                style="display: none; margin-left: 6px;">Ver en grande 🔍</button>
             </div>
-            <button class="copy-btn2" id="copyBtn" onclick="copyGen()">Copiar</button>
-          </div>
-          <div class="output-content" id="genOutput"></div>
-          <div class="preview-content" id="genPreview">
-            <div class="preview-gh-label">Aspecto en GitHub</div>
+            <div class="output-content" id="genOutput"></div>
+            <div class="preview-content" id="genPreview">
+              <div class="preview-gh-label">Aspecto en GitHub</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<hr class="divider">
+  <hr class="divider">
 
-<!-- CONSEJOS -->
-<section id="consejos" class="section">
-  <div class="section-header reveal">
-    <div class="section-label">Buenas prácticas</div>
-    <h2>Úsalos bien</h2>
-  </div>
-  <div class="tips-grid reveal">
-    <div class="tip-card">
-      <div class="tip-card-num">01</div>
-      <h4>No abuses de ellos</h4>
-      <p>Si todo es importante, nada lo es. Reserva los callouts para información realmente crítica o útil.</p>
-    </div>
-    <div class="tip-card">
-      <div class="tip-card-num">02</div>
-      <h4>Elige el tipo correcto</h4>
-      <p>Usa <code>WARNING</code> y <code>CAUTION</code> solo cuando haya un riesgo real, no para información general.</p>
-    </div>
-    <div class="tip-card">
-      <div class="tip-card-num">03</div>
-      <h4>Sé conciso</h4>
-      <p>Los callouts funcionan mejor con textos cortos y directos. Para contenido largo usa párrafos normales.</p>
-    </div>
-    <div class="tip-card">
-      <div class="tip-card-num">04</div>
-      <h4>Dos espacios al final</h4>
-      <p>Añade dos espacios al final de cada línea para crear saltos de línea explícitos en el renderizado.</p>
-    </div>
-  </div>
-</section>
+  <footer>
+    <p>Basado en la <a href="https://github.com/orgs/community/discussions/16925" target="_blank">especificación de
+        alertas de GitHub</a> y el plugin <a href="https://github.com/chrisweb/rehype-github-alerts"
+        target="_blank">rehype-github-alerts</a>.</p>
+  </footer>
 
-<footer>
-  <p>Basado en la <a href="https://github.com/orgs/community/discussions/16925" target="_blank">especificación de alertas de GitHub</a> y el plugin <a href="https://github.com/chrisweb/rehype-github-alerts" target="_blank">rehype-github-alerts</a>.</p>
-</footer>
+  <script>
+    const TYPES = {
+      NOTE: {
+        icon: 'ℹ️', label: 'Note', color: '#3b82f6',
+        bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.4)',
+        subtitle: 'Para información contextual útil',
+        when: 'Úsalo cuando quieras destacar información que el lector debería tener en cuenta aunque esté leyendo por encima. <strong>No implica peligro</strong>, solo es algo relevante que conviene no pasar por alto.',
+        example: 'Los archivos de configuración se guardan en la carpeta <code>/config</code> de tu proyecto.',
+        tips: [
+          'Ideal para aclaraciones técnicas o detalles secundarios.',
+          'No lo uses si la información es crítica para el funcionamiento — en ese caso usa IMPORTANT.',
+          'Funciona bien al final de un paso para añadir contexto extra.'
+        ],
+        code: '> [!NOTE]  \n> Los archivos de configuración se guardan\n> en la carpeta /config de tu proyecto.  '
+      },
+      TIP: {
+        icon: '💡', label: 'Tip', color: '#10b981',
+        bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.4)',
+        subtitle: 'Para consejos y atajos opcionales',
+        when: 'Úsalo para compartir consejos <strong>opcionales</strong> que pueden mejorar la experiencia del usuario, pero sin los cuales el proceso igual funciona. Atajos, mejores prácticas o sugerencias de productividad.',
+        example: 'Puedes usar el atajo Ctrl+Shift+P para abrir la paleta de comandos rápidamente.',
+        tips: [
+          'La palabra clave es "opcional": si es obligatorio, usa NOTE o IMPORTANT.',
+          'Perfecto para atajos de teclado, trucos de rendimiento o alternativas más rápidas.',
+          'Evita usarlo para cosas que el usuario ya debería saber.'
+        ],
+        code: '> [!TIP]  \n> Puedes usar Ctrl+Shift+P para abrir\n> la paleta de comandos rápidamente.  '
+      },
+      IMPORTANT: {
+        icon: '📣', label: 'Important', color: '#a855f7',
+        bg: 'rgba(168,85,247,0.08)', border: 'rgba(168,85,247,0.4)',
+        subtitle: 'Para información crucial sin la que el proceso falla',
+        when: 'Úsalo cuando la información sea <strong>necesaria para el éxito</strong> de la tarea. Sin esta información el usuario podría cometer errores o el proceso no funcionará. Más urgente que NOTE pero sin implicar peligro físico o irreversible.',
+        example: 'Debes configurar las variables de entorno en el archivo .env antes de iniciar el servidor.',
+        tips: [
+          'Si omitir esta información rompe el flujo, es IMPORTANT.',
+          'No lo uses para información general — reservalo para pasos obligatorios.',
+          'Aparece con más peso visual que NOTE, úsalo con criterio.'
+        ],
+        code: '> [!IMPORTANT]  \n> Debes configurar las variables de entorno\n> en el archivo .env antes de iniciar.  '
+      },
+      WARNING: {
+        icon: '⚠️', label: 'Warning', color: '#f59e0b',
+        bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.4)',
+        subtitle: 'Para riesgos que requieren atención inmediata',
+        when: 'Úsalo cuando exista un <strong>riesgo real</strong>: pérdida de datos, errores difíciles de revertir, comportamientos inesperados o situaciones que pueden causar problemas graves si no se toman precauciones.',
+        example: 'Esta operación eliminará permanentemente todos los registros. Haz una copia de seguridad antes de continuar.',
+        tips: [
+          'Reservalo para riesgos reales: pérdida de datos, seguridad, comportamiento destructivo.',
+          'Si el riesgo es menor o reversible, considera usar NOTE o IMPORTANT.',
+          'Sé específico: dile al usuario exactamente qué puede salir mal.'
+        ],
+        code: '> [!WARNING]  \n> Esta operación eliminará todos los registros.\n> Haz una copia de seguridad antes de continuar.  '
+      },
+      CAUTION: {
+        icon: '🔴', label: 'Caution', color: '#ef4444',
+        bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.4)',
+        subtitle: 'Para consecuencias negativas directas de una acción',
+        when: 'Similar a WARNING pero más enfocado en las <strong>consecuencias negativas directas</strong> de hacer algo mal. Se usa cuando una acción concreta tiene un resultado claramente perjudicial que el usuario debe evitar.',
+        example: 'Modificar este archivo manualmente puede corromper la base de datos y requerir una restauración completa.',
+        tips: [
+          'Diferencia clave con WARNING: CAUTION describe la consecuencia de una acción específica.',
+          'Úsalo cuando quieras decir "si haces X, pasará Y (malo)".',
+          'Es el tipo más severo — no lo uses en exceso o perderá impacto.'
+        ],
+        code: '> [!CAUTION]  \n> Modificar este archivo puede corromper\n> la base de datos y requerir restauración.  '
+      },
+      HEADER: {
+        icon: '#️⃣', label: 'Encabezados', color: '#6366f1',
+        bg: 'transparent', border: 'transparent',
+        subtitle: 'Para estructurar el documento en secciones',
+        when: 'Úsalos para dividir tu documento en secciones lógicas. En Markdown se crean usando el carácter numeral <code>#</code> al inicio de una línea, seguido de un espacio. Puedes tener desde H1 (el título principal) hasta H6 (subsección menor).',
+        example: '<div class="preview-normal-text"><h1>Título Principal H1</h1><h2>Subtítulo H2</h2><h3>Sección H3</h3></div>',
+        tips: [
+          'Usa un solo H1 (#) por documento como título principal.',
+          'Sigue una jerarquía lógica: no saltes de H1 a H3 sin pasar por H2.',
+          'No abuses de los títulos grandes, ayudan a la lectura si se usan bien.'
+        ],
+        code: '# Título Principal H1\n\n## Subtítulo H2\n\n### Sección H3'
+      },
+      DIVIDER: {
+        icon: '➖', label: 'Separadores', color: '#9a9690',
+        bg: 'transparent', border: 'transparent',
+        subtitle: 'Para separar secciones visualmente',
+        when: 'Úsalo para crear una línea horizontal divisoria (etiqueta HTML <code>&lt;hr&gt;</code>) y separar temas o secciones grandes de forma limpia sin usar un título.',
+        example: '<div class="preview-normal-text"><p>Párrafo anterior.</p><hr><p>Párrafo posterior.</p></div>',
+        tips: [
+          'Se escribe con tres guiones seguidos <code>---</code> en una línea vacía.',
+          'Asegúrate de dejar una línea vacía antes y después para una correcta visualización.',
+          'Evita usar demasiados separadores seguidos para no fragmentar el texto.'
+        ],
+        code: 'Texto anterior.\n\n---\n\nTexto posterior.'
+      },
+      BOLD: {
+        icon: 'B', label: 'Negrita', color: '#f59e0b',
+        bg: 'transparent', border: 'transparent',
+        subtitle: 'Para enfatizar palabras clave o frases importantes',
+        when: 'Úsalo cuando quieras destacar palabras o conceptos clave dentro de un párrafo normal para que el lector las capte a primera vista.',
+        example: '<div class="preview-normal-text"><p>Este texto contiene <strong>palabras importantes en negrita</strong> para llamar la atención.</p></div>',
+        tips: [
+          'Se escribe rodeando el texto con dos asteriscos <code>**texto**</code> o dos guiones bajos <code>__texto__</code>.',
+          'No pongas párrafos enteros en negrita; pierde su efectividad.',
+          'Combínalo con cursiva usando tres asteriscos <code>***negrita y cursiva***</code>.'
+        ],
+        code: 'Este texto contiene **palabras importantes en negrita**.'
+      },
+      CODE: {
+        icon: '💻', label: 'Código Inline', color: '#d946ef',
+        bg: 'transparent', border: 'transparent',
+        subtitle: 'Para términos técnicos, comandos o código',
+        when: 'Úsalo para destacar comandos, nombres de variables, nombres de archivos o términos de programación dentro de un texto normal sin que se interpreten como formato.',
+        example: '<div class="preview-normal-text"><p>Usa el comando <code>npm run dev</code> para iniciar el servidor local.</p></div>',
+        tips: [
+          'Se escribe rodeando la palabra con una comilla invertida <code>`código`</code>.',
+          'Ideal para nombres de archivos como <code>package.json</code> o variables como <code>apiKey</code>.',
+          'Para bloques de código largos, usa tres comillas invertidas al inicio y al final.'
+        ],
+        code: 'Usa el comando `npm run dev` para iniciar el servidor.'
+      },
+      LIST: {
+        icon: '📋', label: 'Listas', color: '#14b8a6',
+        bg: 'transparent', border: 'transparent',
+        subtitle: 'Para agrupar elementos ordenados o con viñetas',
+        when: 'Úsalas cuando necesites enumerar pasos, características, opciones o elementos relacionados de manera ordenada y legible.',
+        example: '<div class="preview-normal-text"><ul><li>Elemento de viñeta A</li><li>Elemento de viñeta B</li></ul><br><ol><li>Primer paso</li><li>Segundo paso</li></ol></div>',
+        tips: [
+          'Para listas con viñetas usa un guión <code>-</code> o asterisco <code>*</code> al inicio de la línea.',
+          'Para listas numeradas usa el número seguido de un punto y espacio <code>1. </code>.',
+          'Deja una línea en blanco antes de comenzar una lista para evitar problemas de formato.'
+        ],
+        code: '- Elemento A\n- Elemento B\n\n1. Primer paso\n2. Segundo paso'
+      }
+    };
 
-<script>
-const TYPES = {
-  NOTE: {
-    icon: 'ℹ️', label: 'Note', color: '#3b82f6',
-    bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.4)',
-    subtitle: 'Para información contextual útil',
-    when: 'Úsalo cuando quieras destacar información que el lector debería tener en cuenta aunque esté leyendo por encima. <strong>No implica peligro</strong>, solo es algo relevante que conviene no pasar por alto.',
-    example: 'Los archivos de configuración se guardan en la carpeta <code>/config</code> de tu proyecto.',
-    tips: [
-      'Ideal para aclaraciones técnicas o detalles secundarios.',
-      'No lo uses si la información es crítica para el funcionamiento — en ese caso usa IMPORTANT.',
-      'Funciona bien al final de un paso para añadir contexto extra.'
-    ],
-    code: '> [!NOTE]  \n> Los archivos de configuración se guardan\n> en la carpeta /config de tu proyecto.  '
-  },
-  TIP: {
-    icon: '💡', label: 'Tip', color: '#10b981',
-    bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.4)',
-    subtitle: 'Para consejos y atajos opcionales',
-    when: 'Úsalo para compartir consejos <strong>opcionales</strong> que pueden mejorar la experiencia del usuario, pero sin los cuales el proceso igual funciona. Atajos, mejores prácticas o sugerencias de productividad.',
-    example: 'Puedes usar el atajo Ctrl+Shift+P para abrir la paleta de comandos rápidamente.',
-    tips: [
-      'La palabra clave es "opcional": si es obligatorio, usa NOTE o IMPORTANT.',
-      'Perfecto para atajos de teclado, trucos de rendimiento o alternativas más rápidas.',
-      'Evita usarlo para cosas que el usuario ya debería saber.'
-    ],
-    code: '> [!TIP]  \n> Puedes usar Ctrl+Shift+P para abrir\n> la paleta de comandos rápidamente.  '
-  },
-  IMPORTANT: {
-    icon: '📣', label: 'Important', color: '#a855f7',
-    bg: 'rgba(168,85,247,0.08)', border: 'rgba(168,85,247,0.4)',
-    subtitle: 'Para información crucial sin la que el proceso falla',
-    when: 'Úsalo cuando la información sea <strong>necesaria para el éxito</strong> de la tarea. Sin esta información el usuario podría cometer errores o el proceso no funcionará. Más urgente que NOTE pero sin implicar peligro físico o irreversible.',
-    example: 'Debes configurar las variables de entorno en el archivo .env antes de iniciar el servidor.',
-    tips: [
-      'Si omitir esta información rompe el flujo, es IMPORTANT.',
-      'No lo uses para información general — reservalo para pasos obligatorios.',
-      'Aparece con más peso visual que NOTE, úsalo con criterio.'
-    ],
-    code: '> [!IMPORTANT]  \n> Debes configurar las variables de entorno\n> en el archivo .env antes de iniciar.  '
-  },
-  WARNING: {
-    icon: '⚠️', label: 'Warning', color: '#f59e0b',
-    bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.4)',
-    subtitle: 'Para riesgos que requieren atención inmediata',
-    when: 'Úsalo cuando exista un <strong>riesgo real</strong>: pérdida de datos, errores difíciles de revertir, comportamientos inesperados o situaciones que pueden causar problemas graves si no se toman precauciones.',
-    example: 'Esta operación eliminará permanentemente todos los registros. Haz una copia de seguridad antes de continuar.',
-    tips: [
-      'Reservalo para riesgos reales: pérdida de datos, seguridad, comportamiento destructivo.',
-      'Si el riesgo es menor o reversible, considera usar NOTE o IMPORTANT.',
-      'Sé específico: dile al usuario exactamente qué puede salir mal.'
-    ],
-    code: '> [!WARNING]  \n> Esta operación eliminará todos los registros.\n> Haz una copia de seguridad antes de continuar.  '
-  },
-  CAUTION: {
-    icon: '🔴', label: 'Caution', color: '#ef4444',
-    bg: 'rgba(239,68,68,0.08)', border: 'rgba(239,68,68,0.4)',
-    subtitle: 'Para consecuencias negativas directas de una acción',
-    when: 'Similar a WARNING pero más enfocado en las <strong>consecuencias negativas directas</strong> de hacer algo mal. Se usa cuando una acción concreta tiene un resultado claramente perjudicial que el usuario debe evitar.',
-    example: 'Modificar este archivo manualmente puede corromper la base de datos y requerir una restauración completa.',
-    tips: [
-      'Diferencia clave con WARNING: CAUTION describe la consecuencia de una acción específica.',
-      'Úsalo cuando quieras decir "si haces X, pasará Y (malo)".',
-      'Es el tipo más severo — no lo uses en exceso o perderá impacto.'
-    ],
-    code: '> [!CAUTION]  \n> Modificar este archivo puede corromper\n> la base de datos y requerir restauración.  '
-  }
-};
+    let currentModalCode = '';
 
-let currentModalCode = '';
+    function openModal(type) {
+      const t = TYPES[type];
+      document.getElementById('mIcon').textContent = t.icon;
+      document.getElementById('mTitle').textContent = t.label;
+      document.getElementById('mTitle').style.color = t.color;
+      document.getElementById('mSubtitle').textContent = t.subtitle;
+      document.getElementById('mWhen').innerHTML = t.when;
 
-function openModal(type) {
-  const t = TYPES[type];
-  document.getElementById('mIcon').textContent = t.icon;
-  document.getElementById('mTitle').textContent = t.label;
-  document.getElementById('mTitle').style.color = t.color;
-  document.getElementById('mSubtitle').textContent = t.subtitle;
-  document.getElementById('mWhen').innerHTML = t.when;
+      const r = document.getElementById('mRendered');
+      const rt = document.getElementById('mRenderedTitle');
 
-  const r = document.getElementById('mRendered');
-  r.style.borderLeftColor = t.border;
-  r.style.background = t.bg;
-  const rt = document.getElementById('mRenderedTitle');
-  rt.style.color = t.color;
-  rt.textContent = t.icon + ' ' + t.label;
-  document.getElementById('mRenderedBody').innerHTML = t.example;
+      if (['HEADER', 'DIVIDER', 'BOLD', 'CODE', 'LIST'].includes(type)) {
+        rt.style.display = 'flex';
+        rt.style.color = 'var(--text3)';
+        rt.style.fontSize = '11px';
+        rt.style.textTransform = 'none';
+        rt.style.fontWeight = 'normal';
+        rt.innerHTML = `<svg viewBox="0 0 16 16" fill="currentColor" style="width:14px;height:14px;opacity:0.6;margin-right:6px;"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg> Aspecto en GitHub`;
 
-  currentModalCode = t.code;
-  document.getElementById('mCode').textContent = t.code;
-
-  const tipsEl = document.getElementById('mTips');
-  tipsEl.innerHTML = t.tips.map(tip => `<div class="modal-tip">${tip}</div>`).join('');
-
-  document.getElementById('modalOverlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function handleOverlayClick(e) {
-  if (e.target === document.getElementById('modalOverlay')) closeModal();
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-function copyModalCode() {
-  navigator.clipboard.writeText(currentModalCode).then(() => {
-    const btn = document.querySelector('.modal-code-copy');
-    btn.textContent = '✓ Copiado';
-    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
-  });
-}
-
-// ── GENERADOR INTELIGENTE ──────────────────────────────────────────────────
-
-const OCTICONS = {
-  NOTE:      '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>',
-  TIP:       '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"/></svg>',
-  IMPORTANT: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>',
-  WARNING:   '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>',
-  CAUTION:   '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>'
-};
-
-// Inserta una etiqueta callout en la posición del cursor
-function insertCallout(type) {
-  const ta = document.getElementById('genText');
-  const tpl = `\n> [!${type}]  \n> Tu texto aquí...\n`;
-  const s = ta.selectionStart, e = ta.selectionEnd;
-  ta.value = ta.value.substring(0, s) + tpl + ta.value.substring(e);
-  ta.focus();
-  const cursor = s + tpl.length - 18;
-  ta.selectionStart = cursor;
-  ta.selectionEnd = cursor + 17;
-  updateGen();
-}
-
-// Auto-continúa con ">" al pulsar Enter dentro de un callout
-document.getElementById('genText').addEventListener('keydown', function(e) {
-  if (e.key !== 'Enter') return;
-  const s = this.selectionStart, val = this.value;
-  const lastNL = val.lastIndexOf('\n', s - 1);
-  const curLine = val.substring(lastNL + 1, s);
-  const match = curLine.match(/^>\s*/);
-  if (!match) return;
-  e.preventDefault();
-  if (curLine.trim() === '>') {
-    // Salir del callout con Enter en línea vacía
-    this.value = val.substring(0, lastNL + 1) + '\n' + val.substring(this.selectionEnd);
-    this.selectionStart = this.selectionEnd = lastNL + 2;
-  } else {
-    const prefix = match[0];
-    this.value = val.substring(0, s) + '\n' + prefix + val.substring(this.selectionEnd);
-    this.selectionStart = this.selectionEnd = s + 1 + prefix.length;
-  }
-  updateGen();
-});
-
-function safeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
-}
-
-// Parsea el texto, auto-corrige el código y actualiza la previsualización
-function updateGen() {
-  const text = document.getElementById('genText').value;
-  const output = document.getElementById('genOutput');
-  const preview = document.getElementById('genPreview');
-
-  const lines = text.split('\n');
-  let blocks = [], currentType = null, currentBlock = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const m = line.match(/^>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
-    if (m) {
-      if (currentBlock.length) blocks.push({ type: currentType, lines: currentBlock });
-      currentType = m[1].toUpperCase();
-      currentBlock = [line];
-    } else if (currentType) {
-      if (line.trim() === '' && !line.startsWith('>')) {
-        blocks.push({ type: currentType, lines: currentBlock });
-        currentType = null;
-        currentBlock = [line];
+        r.style.border = '1px solid var(--border)';
+        r.style.borderRadius = '8px';
+        r.style.background = 'var(--bg)';
+        r.style.padding = '14px 18px';
       } else {
-        currentBlock.push(line); // lazy continuation
+        rt.style.display = 'flex';
+        rt.style.color = t.color;
+        rt.style.fontSize = '12px';
+        rt.style.textTransform = 'uppercase';
+        rt.style.fontWeight = '500';
+        rt.innerHTML = t.icon + ' ' + t.label;
+
+        r.style.border = 'none';
+        r.style.borderLeft = '3px solid ' + t.border;
+        r.style.borderRadius = '0 8px 8px 0';
+        r.style.background = t.bg;
+        r.style.padding = '14px 18px';
       }
-    } else {
-      currentBlock.push(line);
+
+      document.getElementById('mRenderedBody').innerHTML = t.example;
+
+      currentModalCode = t.code;
+      document.getElementById('mCode').textContent = t.code;
+
+      const tipsEl = document.getElementById('mTips');
+      tipsEl.innerHTML = t.tips.map(tip => `<div class="modal-tip">${tip}</div>`).join('');
+
+      document.getElementById('modalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
     }
-  }
-  if (currentBlock.length) blocks.push({ type: currentType, lines: currentBlock });
 
-  let finalCode = [];
-  // Limpia la previsualización pero conserva el label
-  preview.innerHTML = '<div class="preview-gh-label">Aspecto en GitHub</div>';
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
 
-  blocks.forEach(block => {
-    if (block.type) {
-      const t = TYPES[block.type];
-      // Auto-corrección del código
-      const fixed = block.lines.map((l, idx) => {
-        if (idx === 0) return l;
-        if (l.trim() === '') return '>';
-        if (!l.trimLeft().startsWith('>')) return '> ' + l.trimLeft();
-        return l;
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('modalOverlay')) closeModal();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeModal();
+        closePreviewModal();
+      }
+    });
+
+    function copyModalCode() {
+      navigator.clipboard.writeText(currentModalCode).then(() => {
+        const btn = document.querySelector('.modal-code-copy');
+        btn.textContent = '✓ Copiado';
+        setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
       });
-      finalCode.push(fixed.join('\n'));
-
-      // Previsualización renderizada
-      const cleanText = block.lines.slice(1).map(l => l.replace(/^>[ \t]?/, '')).join('\n');
-      const div = document.createElement('div');
-      div.className = 'preview-rendered';
-      div.style.borderLeftColor = t.color;
-      div.style.background = t.bg;
-      div.innerHTML = `<div class="preview-rendered-title" style="color:${t.color}">${OCTICONS[block.type]} ${t.label}</div><div class="preview-rendered-body">${safeHTML(cleanText)}</div>`;
-      preview.appendChild(div);
-    } else {
-      const normalText = block.lines.join('\n');
-      if (normalText.trim()) {
-        const div = document.createElement('div');
-        div.className = 'preview-normal-text';
-        div.innerHTML = safeHTML(normalText);
-        preview.appendChild(div);
-      }
-      finalCode.push(normalText);
     }
-  });
 
-  output.textContent = finalCode.join('\n');
-}
+    // ── GENERADOR INTELIGENTE ──────────────────────────────────────────────────
 
-function switchOutputTab(tab, btn) {
-  document.querySelectorAll('.output-tab').forEach(b => b.classList.remove('ot-active'));
-  btn.classList.add('ot-active');
-  document.getElementById('genOutput').style.display = tab === 'code' ? '' : 'none';
-  document.getElementById('genPreview').style.display = tab === 'preview' ? 'flex' : 'none';
-  document.getElementById('copyBtn').style.display = tab === 'code' ? '' : 'none';
-}
+    const OCTICONS = {
+      NOTE: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>',
+      TIP: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1.5c-2.363 0-4 1.69-4 3.75 0 .984.424 1.625.984 2.304l.214.253c.223.264.47.556.673.848.284.411.537.896.621 1.49a.75.75 0 0 1-1.484.211c-.04-.282-.163-.547-.37-.847a8.456 8.456 0 0 0-.542-.68c-.084-.1-.173-.205-.268-.32C3.201 7.75 2.5 6.766 2.5 5.25 2.5 2.31 4.863 0 8 0s5.5 2.31 5.5 5.25c0 1.516-.701 2.5-1.328 3.259-.095.115-.184.22-.268.319-.207.245-.383.453-.541.681-.208.3-.33.565-.37.847a.751.751 0 0 1-1.485-.212c.084-.593.337-1.078.621-1.489.203-.292.45-.584.673-.848.075-.088.147-.173.213-.253.561-.679.985-1.32.985-2.304 0-2.06-1.637-3.75-4-3.75ZM5.75 12h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1 0-1.5ZM6 15.25a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z"/></svg>',
+      IMPORTANT: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>',
+      WARNING: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"/></svg>',
+      CAUTION: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>'
+    };
 
-function copyGen() {
-  const code = document.getElementById('genOutput').textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copiado';
-    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = code; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copiado';
-    setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
-  });
-}
+    // Inserta una etiqueta callout en la posición del cursor
+    function insertCallout(type) {
+      const ta = document.getElementById('genText');
+      const tpl = `\n> [!${type}]  \n> Tu texto aquí...\n`;
+      const s = ta.selectionStart, e = ta.selectionEnd;
+      ta.value = ta.value.substring(0, s) + tpl + ta.value.substring(e);
+      ta.focus();
+      const cursor = s + tpl.length - 18;
+      ta.selectionStart = cursor;
+      ta.selectionEnd = cursor + 17;
+      updateGen();
+    }
 
-// Scroll reveal
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-}, { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    // Inserta formato Markdown en la posición del cursor
+    function insertFormat(type) {
+      const ta = document.getElementById('genText');
+      const s = ta.selectionStart, e = ta.selectionEnd;
+      const selectedText = ta.value.substring(s, e);
+      let tpl = '';
+      let selectStartOffset = 0;
+      let selectEndOffset = 0;
 
-updateGen();
-</script>
+      if (type === 'HEADER') {
+        tpl = `\n# ${selectedText || 'Título'}\n`;
+        selectStartOffset = 3;
+        selectEndOffset = tpl.length - 1;
+      } else if (type === 'DIVIDER') {
+        tpl = `\n---\n`;
+        selectStartOffset = tpl.length;
+        selectEndOffset = tpl.length;
+      } else if (type === 'BOLD') {
+        tpl = `**${selectedText || 'texto'}**`;
+        selectStartOffset = 2;
+        selectEndOffset = tpl.length - 2;
+      } else if (type === 'CODE') {
+        tpl = `\`${selectedText || 'código'}\``;
+        selectStartOffset = 1;
+        selectEndOffset = tpl.length - 1;
+      } else if (type === 'LIST') {
+        tpl = `\n- ${selectedText || 'Elemento'}\n`;
+        selectStartOffset = 3;
+        selectEndOffset = tpl.length - 1;
+      }
+
+      ta.value = ta.value.substring(0, s) + tpl + ta.value.substring(e);
+      ta.focus();
+      ta.selectionStart = s + selectStartOffset;
+      ta.selectionEnd = s + selectEndOffset;
+      updateGen();
+    }
+
+    // Auto-continúa con ">" al pulsar Enter dentro de un callout
+    document.getElementById('genText').addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      const s = this.selectionStart, val = this.value;
+      const lastNL = val.lastIndexOf('\n', s - 1);
+      const curLine = val.substring(lastNL + 1, s);
+      const match = curLine.match(/^>\s*/);
+      if (!match) return;
+      e.preventDefault();
+      if (curLine.trim() === '>') {
+        // Salir del callout con Enter en línea vacía
+        this.value = val.substring(0, lastNL + 1) + '\n' + val.substring(this.selectionEnd);
+        this.selectionStart = this.selectionEnd = lastNL + 2;
+      } else {
+        const prefix = match[0];
+        this.value = val.substring(0, s) + '\n' + prefix + val.substring(this.selectionEnd);
+        this.selectionStart = this.selectionEnd = s + 1 + prefix.length;
+      }
+      updateGen();
+    });
+
+    function safeHTML(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+    }
+
+    // Renderiza texto Markdown normal (sin callouts) para la previsualización
+    function renderMarkdownText(text) {
+      const lines = text.split('\n');
+      let html = '';
+      let inList = false;
+      let listType = null;
+
+      const inlineRender = (line) => {
+        // Escapar HTML
+        let s = line.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        // Código inline `...`
+        s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+        // Negrita **texto** o __texto__
+        s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+        // Cursiva *texto* o _texto_
+        s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        s = s.replace(/_([^_]+)_/g, '<em>$1</em>');
+        // Links [texto](url)
+        s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+        return s;
+      };
+
+      const closeLists = () => {
+        if (inList) {
+          html += listType === 'ul' ? '</ul>' : '</ol>';
+          inList = false; listType = null;
+        }
+      };
+
+      for (let i = 0; i < lines.length; i++) {
+        const raw = lines[i];
+        const trimmed = raw.trim();
+
+        // Separadores --- o ***
+        if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+          closeLists();
+          html += '<hr>';
+          continue;
+        }
+        // Encabezados
+        const hm = trimmed.match(/^(#{1,4})\s+(.+)/);
+        if (hm) {
+          closeLists();
+          const level = hm[1].length;
+          html += `<h${level}>${inlineRender(hm[2])}</h${level}>`;
+          continue;
+        }
+        // Listas no ordenadas
+        const ulm = trimmed.match(/^[-*+]\s+(.+)/);
+        if (ulm) {
+          if (!inList || listType !== 'ul') { closeLists(); html += '<ul>'; inList = true; listType = 'ul'; }
+          html += `<li>${inlineRender(ulm[1])}</li>`;
+          continue;
+        }
+        // Listas ordenadas
+        const olm = trimmed.match(/^\d+\.\s+(.+)/);
+        if (olm) {
+          if (!inList || listType !== 'ol') { closeLists(); html += '<ol>'; inList = true; listType = 'ol'; }
+          html += `<li>${inlineRender(olm[1])}</li>`;
+          continue;
+        }
+        // Línea vacía
+        if (trimmed === '') {
+          closeLists();
+          html += '<br>';
+          continue;
+        }
+        // Párrafo normal
+        closeLists();
+        html += `<p style="margin:2px 0;">${inlineRender(raw)}</p>`;
+      }
+      closeLists();
+      return html;
+    }
+
+    // Parsea el texto, auto-corrige el código y actualiza la previsualización
+    function updateGen() {
+      const text = document.getElementById('genText').value;
+      const output = document.getElementById('genOutput');
+      const preview = document.getElementById('genPreview');
+
+      const lines = text.split('\n');
+      let blocks = [], currentType = null, currentBlock = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const m = line.match(/^>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+        if (m) {
+          if (currentBlock.length) blocks.push({ type: currentType, lines: currentBlock });
+          currentType = m[1].toUpperCase();
+          currentBlock = [line];
+        } else if (currentType) {
+          if (line.trim() === '' && !line.startsWith('>')) {
+            blocks.push({ type: currentType, lines: currentBlock });
+            currentType = null;
+            currentBlock = [line];
+          } else {
+            currentBlock.push(line); // lazy continuation
+          }
+        } else {
+          currentBlock.push(line);
+        }
+      }
+      if (currentBlock.length) blocks.push({ type: currentType, lines: currentBlock });
+
+      let finalCode = [];
+      // Limpia la previsualización pero conserva el label
+      preview.innerHTML = '<div class="preview-gh-label">Aspecto en GitHub</div>';
+
+      blocks.forEach(block => {
+        if (block.type) {
+          const t = TYPES[block.type];
+          // Auto-corrección del código
+          const fixed = block.lines.map((l, idx) => {
+            if (idx === 0) return l;
+            if (l.trim() === '') return '>';
+            if (!l.trimLeft().startsWith('>')) return '> ' + l.trimLeft();
+            return l;
+          });
+          finalCode.push(fixed.join('\n'));
+
+          // Previsualización renderizada
+          const cleanText = block.lines.slice(1).map(l => l.replace(/^>[ \t]?/, '')).join('\n');
+          const div = document.createElement('div');
+          div.className = 'preview-rendered';
+          div.style.borderLeftColor = t.color;
+          div.style.background = t.bg;
+          div.innerHTML = `<div class="preview-rendered-title" style="color:${t.color}">${OCTICONS[block.type]} ${t.label}</div><div class="preview-rendered-body">${safeHTML(cleanText)}</div>`;
+          preview.appendChild(div);
+        } else {
+          const normalText = block.lines.join('\n');
+          if (normalText.trim()) {
+            const div = document.createElement('div');
+            div.className = 'preview-normal-text';
+            div.innerHTML = renderMarkdownText(normalText);
+            preview.appendChild(div);
+          }
+          finalCode.push(normalText);
+        }
+      });
+
+      output.textContent = finalCode.join('\n');
+    }
+
+    function switchOutputTab(tab, btn) {
+      document.querySelectorAll('.output-tab').forEach(b => b.classList.remove('ot-active'));
+      btn.classList.add('ot-active');
+      document.getElementById('genOutput').style.display = tab === 'code' ? '' : 'none';
+      document.getElementById('genPreview').style.display = tab === 'preview' ? 'flex' : 'none';
+      document.getElementById('copyBtn').style.display = tab === 'code' ? '' : 'none';
+      document.getElementById('expandBtn').style.display = tab === 'preview' ? '' : 'none';
+    }
+
+    function expandPreview() {
+      const source = document.getElementById('genPreview');
+      const dest = document.getElementById('expandedPreviewBody');
+      dest.innerHTML = source.innerHTML;
+
+      document.getElementById('previewExpandOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePreviewModal() {
+      document.getElementById('previewExpandOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function handlePreviewOverlayClick(e) {
+      if (e.target === document.getElementById('previewExpandOverlay')) {
+        closePreviewModal();
+      }
+    }
+
+    function copyGen() {
+      const code = document.getElementById('genOutput').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copiado';
+        setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+      }).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = code; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copiado';
+        setTimeout(() => { btn.textContent = 'Copiar'; }, 1800);
+      });
+    }
+
+    // Scroll reveal
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    function checkCursorContext() {
+      const ta = document.getElementById('genText');
+      const s = ta.selectionStart;
+      const val = ta.value;
+      const lastNL = val.lastIndexOf('\n', s - 1);
+      const nextNL = val.indexOf('\n', s);
+      const currentLine = val.substring(lastNL + 1, nextNL === -1 ? val.length : nextNL);
+
+      const isInsideCallout = currentLine.trim().startsWith('>');
+      document.getElementById('exitCalloutBtn').style.display = isInsideCallout ? 'inline-block' : 'none';
+    }
+
+    function exitCallout() {
+      const ta = document.getElementById('genText');
+      const s = ta.selectionStart;
+      const val = ta.value;
+      const lastNL = val.lastIndexOf('\n', s - 1);
+      let nextNL = val.indexOf('\n', s);
+      if (nextNL === -1) nextNL = val.length;
+
+      const currentLine = val.substring(lastNL + 1, nextNL);
+
+      if (currentLine.trim() === '>') {
+        ta.value = val.substring(0, lastNL + 1) + '\n' + val.substring(nextNL);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = lastNL + 2;
+      } else {
+        ta.value = val.substring(0, nextNL) + '\n\n' + val.substring(nextNL);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = nextNL + 2;
+      }
+
+      updateGen();
+      checkCursorContext();
+    }
+
+    const genText = document.getElementById('genText');
+    genText.addEventListener('keyup', checkCursorContext);
+    genText.addEventListener('click', checkCursorContext);
+    genText.addEventListener('focus', checkCursorContext);
+    genText.addEventListener('input', checkCursorContext);
+
+    updateGen();
+    checkCursorContext();
+  </script>
 </body>
+
 </html>
