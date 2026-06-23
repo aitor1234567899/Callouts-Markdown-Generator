@@ -55,45 +55,41 @@ Todo funciona directamente en el navegador.
 ## 📚 Tipos de Callouts Soportados
 
 ### ℹ️ NOTE
-
-Información adicional o contexto útil para el lector.
+> [!NOTE]
+> Información adicional o contexto útil para el lector
 
 ```md
 > [!NOTE]
 > Información importante para el lector.
 ```
 
-### 💡 TIP
-
-Consejos, recomendaciones o atajos opcionales.
+> [!TIP]
+> Consejos, recomendaciones o atajos opcionales.
 
 ```md
 > [!TIP]
 > Usa atajos para trabajar más rápido.
 ```
 
-### 📣 IMPORTANT
-
-Información crítica para completar correctamente una tarea.
+> [!IMPORTANT]
+> Información crítica para completar correctamente una tarea.
 
 ```md
 > [!IMPORTANT]
 > Configura las variables de entorno antes de iniciar.
 ```
 
-### ⚠️ WARNING
-
-Advertencias sobre riesgos o posibles problemas.
-
+> [!WARNING]
+>Advertencias sobre riesgos o posibles problemas.
+> 
 ```md
 > [!WARNING]
 > Esta acción eliminará datos permanentemente.
 ```
 
-### 🔴 CAUTION
-
-Consecuencias negativas derivadas de una acción incorrecta.
-
+> [!CAUTION]
+> Consecuencias negativas derivadas de una acción incorrecta.
+> 
 ```md
 > [!CAUTION]
 > Modificar este archivo puede corromper la base de datos.
@@ -104,8 +100,6 @@ Consecuencias negativas derivadas de una acción incorrecta.
 ## 🛠️ Tecnologías
 
 * HTML5
-* CSS3
-* JavaScript (Vanilla)
 
 No utiliza frameworks ni dependencias externas.
 
