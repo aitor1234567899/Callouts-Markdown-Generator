@@ -54,7 +54,7 @@ Todo funciona directamente en el navegador.
 
 ## 📚 Tipos de Callouts Soportados
 
-### ℹ️ NOTE
+
 > [!NOTE]
 > Información adicional o contexto útil para el lector
 
