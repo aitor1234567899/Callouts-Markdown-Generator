@@ -386,20 +386,20 @@ footer a:hover{color:var(--text2)}
   <div class="gen-toolbar">
     <span class="gen-toolbar-label">Callout:</span>
     <div class="gen-toolbar-group">
-      <button class="toolbar-btn" onclick="insertCallout('NOTE')"><span class="tb-icon">ℹ️</span>Note</button>
-      <button class="toolbar-btn" onclick="insertCallout('TIP')"><span class="tb-icon">💡</span>Tip</button>
-      <button class="toolbar-btn" onclick="insertCallout('IMPORTANT')"><span class="tb-icon">📣</span>Important</button>
-      <button class="toolbar-btn" onclick="insertCallout('WARNING')"><span class="tb-icon">⚠️</span>Warning</button>
-      <button class="toolbar-btn" onclick="insertCallout('CAUTION')"><span class="tb-icon">🔴</span>Caution</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertCallout('NOTE')"><span class="tb-icon">ℹ️</span>Note</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertCallout('TIP')"><span class="tb-icon">💡</span>Tip</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertCallout('IMPORTANT')"><span class="tb-icon">📣</span>Important</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertCallout('WARNING')"><span class="tb-icon">⚠️</span>Warning</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertCallout('CAUTION')"><span class="tb-icon">🔴</span>Caution</button>
     </div>
     <div class="gen-toolbar-sep"></div>
     <span class="gen-toolbar-label">Formato:</span>
     <div class="gen-toolbar-group">
-      <button class="toolbar-btn" onclick="insertFormat('HEADER')"><span class="tb-icon">#️⃣</span>Título</button>
-      <button class="toolbar-btn" onclick="insertFormat('DIVIDER')"><span class="tb-icon">➖</span>Línea</button>
-      <button class="toolbar-btn" onclick="insertFormat('BOLD')"><span class="tb-icon"><b style="font-size:12px">B</b></span>Negrita</button>
-      <button class="toolbar-btn" onclick="insertFormat('CODE')"><span class="tb-icon">💻</span>Código</button>
-      <button class="toolbar-btn" onclick="insertFormat('LIST')"><span class="tb-icon">📋</span>Lista</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertFormat('HEADER')"><span class="tb-icon">#️⃣</span>Título</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertFormat('DIVIDER')"><span class="tb-icon">➖</span>Línea</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertFormat('BOLD')"><span class="tb-icon"><b style="font-size:12px">B</b></span>Negrita</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertFormat('CODE')"><span class="tb-icon">💻</span>Código</button>
+      <button class="toolbar-btn" onmousedown="event.preventDefault()" onclick="insertFormat('LIST')"><span class="tb-icon">📋</span>Lista</button>
     </div>
   </div>
 
